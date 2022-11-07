@@ -1,0 +1,74 @@
+form {
+    width: 100%;
+}
+@media screen and (max-width: 768px) {
+    
+}
+#icon-left {
+    color:#ffffff;
+    opacity: 0.8;
+    font-size: 1.5rem;
+}
+/* .nav-item {
+    display: inline-flex;
+} */
+.nav-item {
+    display: flex;
+    align-items: center;
+    margin: 0 0.3rem;
+}
+.nav-item a {
+    color: #fff;
+    text-decoration: none;
+    /* font-size: 1.2rem; */
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+}
+.nav-item a:hover {
+    color: #e50914;
+    background-color: #0f0f0f;
+    opacity: 0.9;
+}
+/* .nav-item i{
+    margin-right: 0.5rem;
+} */
+@media screen and (max-width: 768px) {
+    .nav-item i{
+        margin-right: 0.5rem;
+    }
+}
+/* .nav-item:hover {
+    color: #e50914;
+    background-color: #0f0f0f;
+    opacity: 0.9;
+} */
+/* CIcon {
+    margin-right: 5px;
+    width: 5px;
+    height: 5px;
+} */
+.navbar-home {
+    color: #ffffff;
+    background-color: #0f0f0f;
+    opacity: 0.8;
+}
+.header-image {
+    width: 6rem;
+    height: 3rem;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+    background-size: cover;
+    margin: 0 1rem 0 0.3rem;
+}
+/* i {
+    color: #fff;
+    background-color: #0f0f0f;
+    opacity: 0.8;
+}
+i:hover {
+    color: #e50914;
+    background-color: #0f0f0f;
+    opacity: 0.9;
+} */
