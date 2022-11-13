@@ -1,5 +1,6 @@
 const Validator = require('fastest-validator');
 const { Genre } = require('../../models');
+const { v4: uuidv4 } = require('uuid');
 
 const v = new Validator();
 
@@ -60,7 +61,10 @@ module.exports = {
             if (validate.length) {
                 return res.status(400).json(validate);
             }
-            const genre = await Genre.create(req.body);
+            const genre = await Genre.create({
+                name: req.body.name,
+                random: uuidv4()
+            });
             return res.json(genre);
         } catch (error) {
             res.json({

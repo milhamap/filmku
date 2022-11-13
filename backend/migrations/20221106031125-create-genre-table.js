@@ -10,6 +10,10 @@ module.exports = {
         autoIncrement: true,
         allowNull: false
       },
+      random: {
+        type: Sequelize.STRING(100),
+        allowNull: false,
+      },
       name: {
         type: Sequelize.STRING(50),
         allowNull: false

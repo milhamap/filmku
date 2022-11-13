@@ -1,18 +1,187 @@
 const Validator = require('fastest-validator');
 const { Op } = require('sequelize');
 const fs = require('fs');
-const { Film, Rating, Genre } = require('../../models');
+const { v4: uuidv4 } = require('uuid');
+const { Film, User, Genre, Actor, Showtime, Rating } = require('../../models');
 
 const v = new Validator();
 
 module.exports = {
-    getFilms: async (req, res) => {
+    getFilm: async (req, res) => {
         try {
-            if (req.body.title) {
+            const { random } = req.params;
+            let film;
+            const films = await Film.findOne({
+                where: {
+                    random: random
+                },
+            });
+            // console.log(films);
+            const rating = await Rating.findOne({
+                where: {
+                    film_id: films.id
+                },
+                attributes: [
+                    [Rating.sequelize.fn('AVG', Rating.sequelize.col('rate')), 'rating']
+                ]
+            });
+            // console.log(rating.dataValues.rating);
+            if(rating.dataValues.rating === null) {
+                film = await Film.findOne({
+                    where: {
+                        id: films.id,
+                    },
+                    include: [
+                        {
+                            model: Genre,
+                            as: 'genres',
+                            attributes: {
+                                exclude: ['createdAt', 'updatedAt'],
+                            },
+                        },
+                        {
+                            model: User,
+                            as: 'users',
+                            attributes: {
+                                exclude: ['createdAt', 'updatedAt', 'id', 'password', 'email', 'role_id', 'refreshToken', 'phone'],
+                            },
+                        },
+                        {
+                            model: Actor,
+                            as: 'actors',
+                            attributes: {
+                                exclude: ['createdAt', 'updatedAt', 'id'],
+                            },
+                        },
+                        {
+                            model: Showtime,
+                            as: 'showtimes',
+                            attributes: {
+                                exclude: ['createdAt', 'updatedAt', 'id', 'film_id'],
+                            },
+                        }
+                    ],
+                    attributes: {
+                        exclude: ['createdAt', 'updatedAt', 'genre_id', 'user_id'],
+                    },
+                });
+                if (!film) {
+                    return res.status(404).send({
+                        status: 'error',
+                        message: 'film not found',
+                    });
+                }
+    
+                res.send({
+                    status: 'success',
+                    data: {
+                        film,
+                        rating: 0,
+                    }
+                });
+            } else {
+                film = await Film.findOne({
+                    where: {
+                        id: films.id,
+                    },
+                    include: [
+                        {
+                            model: Genre,
+                            as: 'genres',
+                            attributes: {
+                                exclude: ['createdAt', 'updatedAt'],
+                            },
+                        },
+                        {
+                            model: User,
+                            as: 'users',
+                            attributes: {
+                                exclude: ['createdAt', 'updatedAt', 'id', 'password', 'email', 'role_id', 'refreshToken', 'phone'],
+                            },
+                        },
+                        {
+                            model: Actor,
+                            as: 'actors',
+                            attributes: {
+                                exclude: ['createdAt', 'updatedAt', 'id', 'film_id'],
+                            },
+                        },
+                        {
+                            model: Rating,
+                            as: 'ratings',
+                            attributes: {
+                                exclude: ['createdAt', 'updatedAt', 'id', 'film_id'],
+                            },
+                        },
+                        {
+                            model: Showtime,
+                            as: 'showtimes',
+                            attributes: {
+                                exclude: ['createdAt', 'updatedAt', 'id', 'film_id'],
+                            },
+                        }
+                    ],
+                    attributes: {
+                        exclude: ['createdAt', 'updatedAt', 'genre_id', 'user_id'],
+                    },
+                });
+                if (!film) {
+                    return res.status(404).send({
+                        status: 'error',
+                        message: 'film not found',
+                    });
+                }
+    
+                res.send({
+                    status: 'success',
+                    data: {
+                        film,
+                        rating: rating.dataValues.rating,
+                    }
+                });
+            }
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).send({
+                status: 'error',
+                message: 'server error',
+            });
+        }
+    },
+    getFilmByRating: async (req, res) => {
+        try {
+            const films = await Film.findAll({
+                limit: 2,
+                order: [
+                    ['rating', 'DESC']
+                ],
+                group: ['id']
+            })
+            // console.log(films);
+            res.json({
+                status: 'success',
+                data: films
+            })
+        } catch (error) {
+            console.log(error);
+            res.status(500).send({
+                status: 'error',
+                message: 'server error',
+            });
+        }
+    },
+    getFilmsComingSoon: async (req, res) => {
+        try {
+            const {title} = req.query;
+            if(title) {
                 const films = await Film.findAll({
                     where: {
                         title: {
-                            [Op.like]: `%${req.body.title}%`
+                            [Op.like]: `%${title}%`
+                        },
+                        release_date: {
+                            [Op.gte]: new Date()
                         }
                     },
                     include: [
@@ -20,22 +189,89 @@ module.exports = {
                             model: Genre,
                             as: 'genres',
                             attributes: {
-                                exclude: ['createdAt', 'updatedAt']
-                            }
-                        }
+                                exclude: ['createdAt', 'updatedAt'],
+                            },
+                        },
                     ],
                     attributes: {
-                        exclude: ['createdAt', 'updatedAt']
-
-                    }
+                        exclude: ['createdAt', 'updatedAt'],
+                    },
                 });
-                console.log(films);
+                if(!films) {
+                    return res.status(404).send({
+                        status: 'error',
+                        message: 'film not found',
+                    });
+                }
                 res.send({
                     status: 'success',
-                    message: 'List of films',
-                    data: {
-                        films
+                    data: films
+                });
+            }
+            const data = await Film.findAll({
+                where: {
+                    release_date: {
+                        [Op.gte]: new Date()
                     }
+                },
+                include: [
+                    {
+                        model: Genre,
+                        as: 'genres',
+                        attributes: {
+                            exclude: ['createdAt', 'updatedAt']
+                        }
+                    }
+                ],
+                attributes: {
+                    exclude: ['createdAt', 'updatedAt']
+                }
+            });
+
+            res.status(200).send({
+                status: 'success',
+                data: data
+            });
+        } catch (error) {
+            console.log(error);
+            res.status(500).send({
+                status: 'error',
+                message: 'Server Error'
+            });
+        }
+    },
+    getFilms: async (req, res) => {
+        try {
+            const {title} = req.query;
+            if(title) {
+                const films = await Film.findAll({
+                    where: {
+                        title: {
+                            [Op.like]: `%${title}%`
+                        }
+                    },
+                    include: [
+                        {
+                            model: Genre,
+                            as: 'genres',
+                            attributes: {
+                                exclude: ['createdAt', 'updatedAt'],
+                            },
+                        },
+                    ],
+                    attributes: {
+                        exclude: ['createdAt', 'updatedAt'],
+                    },
+                });
+                if(!films) {
+                    return res.status(404).send({
+                        status: 'error',
+                        message: 'film not found',
+                    });
+                }
+                res.send({
+                    status: 'success',
+                    data: films
                 });
             }
             const data = await Film.findAll({
@@ -52,7 +288,77 @@ module.exports = {
                     exclude: ['createdAt', 'updatedAt']
                 }
             });
-            console.log(data);
+
+            res.status(200).send({
+                status: 'success',
+                data: data
+            });
+        } catch (error) {
+            console.log(error);
+            res.status(500).send({
+                status: 'error',
+                message: 'Server Error'
+            });
+        }
+    },
+    getFilmsOnGoing: async (req, res) => {
+        try {
+            const {title} = req.query;
+            console.log(new Date());
+            if(title) {
+                const films = await Film.findAll({
+                    where: {
+                        title: {
+                            [Op.like]: `%${title}%`
+                        },
+                        // release_date sedang berlangsung
+                        release_date: {
+                            [Op.lte]: new Date()
+                        }
+                    },
+                    include: [
+                        {
+                            model: Genre,
+                            as: 'genres',
+                            attributes: {
+                                exclude: ['createdAt', 'updatedAt'],
+                            },
+                        },
+                    ],
+                    attributes: {
+                        exclude: ['createdAt', 'updatedAt'],
+                    },
+                });
+                if(!films) {
+                    return res.status(404).send({
+                        status: 'error',
+                        message: 'film not found',
+                    });
+                }
+                res.send({
+                    status: 'success',
+                    data: films
+                });
+            }
+            const data = await Film.findAll({
+                where: {
+                    release_date: {
+                        [Op.lte]: new Date()
+                    }
+                },
+                include: [
+                    {
+                        model: Genre,
+                        as: 'genres',
+                        attributes: {
+                            exclude: ['createdAt', 'updatedAt']
+                        }
+                    }
+                ],
+                attributes: {
+                    exclude: ['createdAt', 'updatedAt']
+                }
+            });
 
             res.status(200).send({
                 status: 'success',
@@ -67,14 +373,15 @@ module.exports = {
         }
     },
     createFilm: async (req, res) => {
-        const { title, price, description, duration, genre_id, image, showtimes, release_date, expire_date } = req.body;
+        const { title, price, description, duration, genre_id, address, showtimes, release_date, expire_date, actors } = req.body;
         // const schema = {
         //     title: 'string|empty:false',
         //     price: 'number|empty:false',
         //     description: 'string|empty:false',
         //     duration: 'number|empty:false',
         //     genre_id: 'number|empty:false',
-        //     showtimes: 'string|empty:false',
+        //     // showtimes: 'array|items:time|empty:false',
+        //     actors: 'array|items:string|empty:false',
         //     release_date: 'date|empty:false',
         //     expire_date: 'date|empty:false',
         // };
@@ -89,11 +396,7 @@ module.exports = {
         //         message: validate,
         //     });
         // }
-
-        const durasi = req.body.duration + ' minutes';
-
-        // console.log(req.file);
-
+        const durasi = duration + ' Minutes';
         try {
             const film = await Film.create({
                 title,
@@ -101,36 +404,51 @@ module.exports = {
                 description,
                 duration: durasi,
                 genre_id,
+                address,
                 image: req.file.filename,
-                showtimes,
                 release_date,
                 expire_date,
-                user_id: req.id,
+                user_id: userId,
+                random: uuidv4(),
             });
-            // console.log(film);
-            // get data film dan genre data
-            const data = await Film.findOne({
-                where: {
-                    id: film.dataValues.id,
-                },
-                include: {
-                    model: Genre,
-                    as: 'genres',
-                    attributes: {
-                        exclude: ['createdAt', 'updatedAt'],
-                    },
-                },
-                attributes: {
-                    exclude: ['createdAt', 'updatedAt'],
-                },
-            });
+            let result_actor, result_showtime;
+            if(actors.length > 0 || showtimes.length > 0) {
+                result_actor = await Actor.bulkCreate(actors.map((actor) => ({
+                    actor: actor,
+                    film_id: film.id,
+                    random: uuidv4(),
+                })));
+                result_showtime = await Showtime.bulkCreate(showtimes.map((showtime) => ({
+                    showtimes: showtime,
+                    film_id: film.id,
+                    random: uuidv4(),
+                })));
+                // console.log(result_actor)
+            }
+            // const data = await Film.findOne({
+            //     where: {
+            //         id: film.dataValues.id,
+            //     },
+            //     include: {
+            //         model: Genre,
+            //         as: 'genres',
+            //         attributes: {
+            //             exclude: ['createdAt', 'updatedAt'],
+            //         },
+            //     },
+            //     attributes: {
+            //         exclude: ['createdAt', 'updatedAt'],
+            //     },
+            // });
 
-            console.log(data);
+            // console.log(data);
 
             res.status(201).json({
                 status: 'success',
                 data: {
                     film,
+                    result_actor,
+                    result_showtime
                 },
             });
         } catch (error) {

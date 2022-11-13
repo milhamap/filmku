@@ -1,10 +1,16 @@
 var express = require('express');
 var router = express.Router();
-const { getFilms, createFilm, readImage } = require('../controllers/film');
+const { getFilm, getFilms, getFilmsComingSoon, getFilmsOnGoing, createFilm, readImage, getFilmByRating } = require('../controllers/film');
 const { verifyToken } = require('../middleware/verifyToken');
+const { isCustomer, isSaler } = require('../middleware/index');
 
+// router.get('/byTitle', getFIlmByTitle);
 router.get('/', getFilms);
-router.post('/', verifyToken, createFilm);
+router.get('/coming-soon', getFilmsComingSoon);
+router.get('/rating', getFilmByRating);
+router.get('/on-going', getFilmsOnGoing);
+router.get('/:random', getFilm);
+router.post('/', isSaler, createFilm);
 router.get('/thumbnail/:id', readImage);
 
 module.exports = router;

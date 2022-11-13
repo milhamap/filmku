@@ -2,6 +2,16 @@
 const { DataTypes } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
     const Rating = sequelize.define('Rating', {
+        id: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            autoIncrement: true,
+            allowNull: false
+        },
+        random: {
+            type: DataTypes.STRING(100),
+            allowNull: false,
+        },
         user_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
@@ -19,9 +29,17 @@ module.exports = (sequelize, DataTypes) => {
             }
         },
         rate:{
-            type: DataTypes.INTEGER(5),
+            type: DataTypes.FLOAT,
             allowNull: false,
-        }
+        },
+        createdAt: {
+            type: DataTypes.DATE,
+            allowNull: false
+        },
+        updatedAt: {
+            type: DataTypes.DATE,
+            allowNull: false
+        },
     }, {
         tableName: 'ratings',
     });

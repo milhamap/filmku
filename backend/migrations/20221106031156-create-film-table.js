@@ -10,6 +10,10 @@ module.exports = {
         autoIncrement: true,
         allowNull: false
       },
+      random: {
+        type: Sequelize.STRING(100),
+        allowNull: false,
+      },
       title: {
         type: Sequelize.STRING(50),
         allowNull: false
@@ -39,7 +43,7 @@ module.exports = {
         }
       },
       rating: {
-        type: Sequelize.INTEGER(5),
+        type: Sequelize.FLOAT,
         allowNull: false,
         defaultValue: 0
       },
@@ -48,10 +52,6 @@ module.exports = {
         allowNull: false
       },
       duration: {
-        type: Sequelize.STRING(15),
-        allowNull: false
-      },
-      showtimes: {
         type: Sequelize.STRING(15),
         allowNull: false
       },

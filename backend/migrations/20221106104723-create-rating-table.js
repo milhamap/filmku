@@ -4,6 +4,16 @@
 module.exports = {
   async up (queryInterface, Sequelize) {
     await queryInterface.createTable('ratings', { 
+      id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+        allowNull: false
+      },
+      random: {
+        type: Sequelize.STRING(100),
+        allowNull: false,
+      },
       user_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -21,9 +31,17 @@ module.exports = {
         }
       },
       rate:{
-        type: Sequelize.INTEGER(5),
+        type: Sequelize.FLOAT,
         allowNull: false,
-      }
+      },
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: false
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        allowNull: false
+      },
     });
   },
 

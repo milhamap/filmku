@@ -10,6 +10,10 @@ module.exports = (sequelize, DataTypes) => {
             autoIncrement: true,
             allowNull: false
         },
+        random: {
+            type: DataTypes.STRING(100),
+            allowNull: false,
+        },
         name: {
             type: DataTypes.STRING(50),
             allowNull: false

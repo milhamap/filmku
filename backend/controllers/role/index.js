@@ -1,5 +1,6 @@
 const Validator = require('fastest-validator');
 const { Role } = require('../../models');
+const { v4: uuidv4 } = require('uuid');
 
 const v = new Validator();
 
@@ -23,12 +24,14 @@ module.exports = {
             const schema = {
                 name: 'string',
             };
+            console.log(uuidv4()); 
             const validate = v.validate({
                 name
             }, schema);
             if (validate.length) return res.status(400).json(validate);
             const role = await Role.create({
                 name: name,
+                random: uuidv4()
             });
             res.json({
                 message: 'Role created',

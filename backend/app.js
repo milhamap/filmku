@@ -11,6 +11,11 @@ var usersRouter = require('./routes/users');
 var genresRouter = require('./routes/genres');
 var rolesRouter = require('./routes/roles');
 var filmsRouter = require('./routes/films');
+var ratingsRouter = require('./routes/ratings');
+var roomsRouter = require('./routes/rooms');
+var chairsRouter = require('./routes/chairs');
+var showtimesRouter = require('./routes/showtimes');
+var transactionsRouter = require('./routes/transactions');
 
 var app = express();
 
@@ -49,6 +54,11 @@ app.use('/auth', usersRouter);
 app.use('/genres', genresRouter);
 app.use('/roles', rolesRouter);
 app.use('/films', filmsRouter);
+app.use('/ratings', ratingsRouter);
+app.use('/rooms', roomsRouter);
+app.use('/chairs', chairsRouter);
+app.use('/showtimes', showtimesRouter);
+app.use('/transactions', transactionsRouter);
 
 // app.listen(9000, () => console.log(`Server is running on http://localhost:${PORT}`));
 

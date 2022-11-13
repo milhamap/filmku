@@ -8,6 +8,10 @@ module.exports = (sequelize, DataTypes) => {
             autoIncrement: true,
             allowNull: false
         },
+        random: {
+            type: DataTypes.STRING(100),
+            allowNull: false,
+        },
         title: {
             type: DataTypes.STRING(50),
             allowNull: false
@@ -37,7 +41,7 @@ module.exports = (sequelize, DataTypes) => {
             }
         },
         rating: {
-            type: DataTypes.INTEGER(5),
+            type: DataTypes.FLOAT,
             allowNull: true
         },
         image: {
@@ -45,10 +49,6 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false
         },
         duration: {
-            type: DataTypes.STRING(15),
-            allowNull: false
-        },
-        showtimes: {
             type: DataTypes.STRING(15),
             allowNull: false
         },
@@ -84,6 +84,22 @@ module.exports = (sequelize, DataTypes) => {
         Film.hasMany(models.Rating, {
             foreignKey: 'film_id',
             as: 'ratings'
+        });
+        Film.hasMany(models.Actor, {
+            foreignKey: 'film_id',
+            as: 'actors'
+        });
+        Film.hasMany(models.Transaction, {
+            foreignKey: 'film_id',
+            as: 'transactions'
+        });
+        Film.hasMany(models.Default_Room, {
+            foreignKey: 'film_id',
+            as: 'default_rooms'
+        });
+        Film.hasMany(models.Default_Actor, {
+            foreignKey: 'film_id',
+            as: 'default_actors'
         });
     };
     return Film;

@@ -2,6 +2,7 @@ const Validator = require('fastest-validator');
 const { User } = require('../../models');
 const { Role } = require('../../models');
 const bcrypt = require('bcrypt');
+const { v4: uuidv4 } = require('uuid');
 const jwt = require('jsonwebtoken');
 
 const v = new Validator();
@@ -15,16 +16,14 @@ module.exports = {
                 password: 'string|min:6|same:confirmPassword',
                 confirmPassword: 'string|min:6|same:password',
                 name: 'string|empty:false',
-                phone: 'string|empty:false',
-                role_id: 'number|empty:false',
+                phone: 'string|empty:false|min:11|max:13',
             };
             const validate = v.validate({
                 name,
                 email,
                 password,
                 confirmPassword,
-                phone,
-                role_id
+                phone
             }, schema);
             if (validate.length) return res.status(400).json(validate);
             if (password !== confirmPassword) res.status(400).json({ message: 'Password or email not match' });
@@ -35,7 +34,8 @@ module.exports = {
                 email: email,
                 password: hashedPassword,
                 phone: phone,
-                role_id: role_id
+                random: uuidv4(),
+                role_id: 3
             });
             // get user data dan role data
             const users = await User.findOne({
@@ -47,7 +47,7 @@ module.exports = {
                     as: 'roles'
                 }
             });
-            const { id, name: userName, email: userMail, password: userPassword, phone: userPhone } = users.dataValues;
+            const { id, name: userName, email: userMail, password: userPassword, phone: userPhone, random } = users.dataValues;
             let { id: roleId, name: roleName } = users.roles.dataValues;
             // console.log(users.dataValues);
             // console.log(users.roles.dataValues)
@@ -55,6 +55,7 @@ module.exports = {
                 message: 'Register success',
                 data: {
                     id: id,
+                    random: random,
                     name: userName,
                     email: userMail,
                     phone: userPhone,
@@ -94,7 +95,7 @@ module.exports = {
             if (!user) return res.status(400).json({ message: 'User not found' });
             const validPassword = await bcrypt.compare(password, user.password);
             if (!validPassword) return res.status(400).json({ message: 'Password not match' });
-            const { id, name, email: userMail, password: userPassword, phone, role_id } = user.dataValues;
+            const { id, name, email: userMail, phone } = user.dataValues;
             let { id: roleId, name: roleName } = user.roles.dataValues;
             const accessToken = jwt.sign({id, email, roleId}, process.env.ACCESS_TOKEN_SECRET, {
                 expiresIn: '3h'
@@ -146,24 +147,73 @@ module.exports = {
                 accessToken: accessToken
             });
         })
-    }, 
-    logout: async (req, res) => {
-        const refreshToken = req.cookies.refreshToken;
-        if(!refreshToken) return res.sendStatus(204);
+    },
+    getUser: async (req, res) => {
+        // get user with authorization bearer token
         const user = await User.findOne({
             where: {
-                refreshToken: refreshToken
+                id: userId
+            },
+            include: {
+                model: Role,
+                as: 'roles'
             }
         });
-        if (!user) return res.sendStatus(204);
-        await User.update({
-            refreshToken: null
-        }, {
-            where: {
-                id: user.id
+        const { id, name, email, phone } = user.dataValues;
+        let { id: roleId, name: roleName } = user.roles.dataValues;
+        return res.json({
+            message: 'Get user success',
+            data: {
+                id: id,
+                name: name,
+                email: email,
+                phone: phone,
+                role: {
+                    id: roleId,
+                    name: roleName
+                }
             }
         });
-        res.clearCookie('refreshToken');
-        return res.sendStatus(200);
+    },
+    logout: async (req, res) => {
+        // res.cookie('refreshToken', '', {
+        //     httpOnly: true,
+        //     maxAge: 0
+        // })
+        const token = req.cookies.refreshToken;
+        // console.log(res.token.refreshToken);
+        // console.log(res.cookie('refreshToken'));
+        // return res.json({
+        //     message: 'Logout success'
+        // });
+        // const refreshToken = req.cookies.refreshToken; 
+        // if(!refreshToken) return res.sendStatus(204);
+        // const { token } = req.body.token;
+        // console.log(token);
+        try {
+            console.log(token);
+            const user = await User.findOne({
+                where: {
+                    refreshToken: token
+                }
+            });
+            console.log(user);
+            await User.update({
+                refreshToken: null
+            }, {
+                where: {
+                    id: user.id
+                }
+            });
+            if (!user) return res.sendStatus(204);
+            console.log(res.cookie('refreshToken'));
+            res.clearCookie('refreshToken');
+            console.log(res.cookie('refreshToken'));
+            res.sendStatus(200);
+        }catch(error) {
+            res.json({
+                message: error.message
+            });
+        }
     }
 }

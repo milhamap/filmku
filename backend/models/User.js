@@ -8,6 +8,10 @@ module.exports = (sequelize, DataTypes) => {
             autoIncrement: true,
             allowNull: false
         },
+        random: {
+            type: DataTypes.STRING(100),
+            allowNull: false,
+        },
         name: {
             type: DataTypes.STRING(100),
             allowNull: false
@@ -62,6 +66,10 @@ module.exports = (sequelize, DataTypes) => {
         User.hasMany(models.Rating, {
             foreignKey: 'user_id',
             as: 'ratings'
+        });
+        User.hasMany(models.Transaction, {
+            foreignKey: 'user_id',
+            as: 'transactions'
         });
     };
     return User;
