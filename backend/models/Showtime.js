@@ -12,6 +12,14 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING(100),
             allowNull: false,
         },
+        film_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: {
+                model: 'films',
+                key: 'id'
+            }
+        },
         showtimes: {
             type: DataTypes.TIME,
             allowNull: false,
@@ -29,14 +37,14 @@ module.exports = (sequelize, DataTypes) => {
     });
     Showtime.associate = function(models) {
         // associations can be defined here
-        Showtime.hasMany(models.Transaction, {
-            foreignKey: 'showtime_id',
-            as: 'transactions'
-        });
         Showtime.hasMany(models.Default_Room, {
             foreignKey: 'showtime_id',
             as: 'default_rooms'
         })
+        Showtime.belongsTo(models.Film, {
+            foreignKey: 'film_id',
+            as: 'films'
+        });
     }
     return Showtime;
 }

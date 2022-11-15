@@ -29,10 +29,6 @@ module.exports = (sequelize, DataTypes) => {
     });
     Chair.associate = function(models) {
         // associations can be defined here
-        Chair.hasMany(models.Transaction, {
-            foreignKey: 'chair_id',
-            as: 'transactions'
-        });
         Chair.hasMany(models.Default_Chair, {
             foreignKey: 'chair_id',
             as: 'default_Chairs'

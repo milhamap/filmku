@@ -12,6 +12,14 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING(100),
             allowNull: false,
         },
+        film_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: {
+                model: 'films',
+                key: 'id'
+            }
+        },
         name: {
             type: DataTypes.STRING(50),
             allowNull: false,
@@ -29,9 +37,9 @@ module.exports = (sequelize, DataTypes) => {
     });
     Actor.associate = function(models) {
         // associations can be defined here
-        Actor.hasMany(models.Default_Actor, {
-            foreignKey: 'actor_id',
-            as: 'default_Actors'
+        Actor.belongsTo(models.Film, {
+            foreignKey: 'film_id',
+            as: 'films'
         });
     }
     return Actor;

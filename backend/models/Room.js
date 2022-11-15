@@ -29,14 +29,10 @@ module.exports = (sequelize, DataTypes) => {
     });
     Room.associate = function(models) {
         // associations can be defined here
-        Room.hasMany(models.Transaction, {
-            foreignKey: 'room_id',
-            as: 'transactions'
-        });
-        Room.hasMany(models.Default_Room, {
-            foreignKey: 'room_id',
-            as: 'default_rooms'
-        })
+        // Room.hasMany(models.Default_Room, {
+        //     foreignKey: 'room_id',
+        //     as: 'default_rooms'
+        // })
         Room.hasMany(models.Default_Chair, {
             foreignKey: 'room_id',
             as: 'default_chairs'

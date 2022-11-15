@@ -49,6 +49,10 @@ module.exports = (sequelize, DataTypes) => {
             foreignKey: 'chair_id',
             as: 'chair'
         });
+        Default_Chair.hasMany(models.Default_Room, {
+            foreignKey: 'def_chair_id',
+            as: 'default_rooms'
+        });
     }
     return Default_Chair;
 }

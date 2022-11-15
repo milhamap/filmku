@@ -2,7 +2,7 @@ const Validator = require('fastest-validator');
 const { Op } = require('sequelize');
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
-const { Film, User, Genre, Actor, Showtime, Rating } = require('../../models');
+const { Film, User, Genre, Actor, Showtime, Rating, Default_Chair, Default_Room, Room } = require('../../models');
 
 const v = new Validator();
 
@@ -373,7 +373,7 @@ module.exports = {
         }
     },
     createFilm: async (req, res) => {
-        const { title, price, description, duration, genre_id, address, showtimes, release_date, expire_date, actors } = req.body;
+        const { title, price, description, duration, genre_id, address, showtimes, rooms, release_date, expire_date, actors } = req.body;
         // const schema = {
         //     title: 'string|empty:false',
         //     price: 'number|empty:false',
@@ -411,10 +411,48 @@ module.exports = {
                 user_id: userId,
                 random: uuidv4(),
             });
+            // let find;
+            // actors.forEach(async actor => {
+            //     find = await Actor.findOne({
+            //         where: {
+            //             [Op.lte]: `%${actor}%`
+            //         }
+            //     });
+            //     console.log(find);
+                // if(find == null) {
+                //     find = await Actor.create({
+                //         name: actor,
+                //     });
+                // }
+                // console.log(find);
+                // await Default_Actor.create({
+                //     film_id: film.id,
+                //     actor_id: find.id,
+                //     random: uuidv4()
+                // });
+            // });
+            // console.log(result);
+            // result = await Promise.all(search);
+            // console.log(result);
+            // akses nilai search
+            // let findRoom;
+            // rooms.forEach(async room => {
+            //     findRoom = await Room.findOne({
+            //         where: {
+            //             [Op.lte]: `%${room}%`
+            //         }
+            //     });
+            //     await Default_Room.create(search.map(item => ({
+            //         film_id: film.id,
+            //         room_id: findRoom.id,
+            //         showtime_id: item.id,
+            //         random: uuidv4()
+            //     })));
+            // });
             let result_actor, result_showtime;
-            if(actors.length > 0 || showtimes.length > 0) {
+            if(actors.length >= 0 || showtimes.length >= 0) {
                 result_actor = await Actor.bulkCreate(actors.map((actor) => ({
-                    actor: actor,
+                    name: actor,
                     film_id: film.id,
                     random: uuidv4(),
                 })));
@@ -423,8 +461,42 @@ module.exports = {
                     film_id: film.id,
                     random: uuidv4(),
                 })));
-                // console.log(result_actor)
             }
+            const res_time = await Showtime.findAll({
+                where: {
+                    film_id: film.id
+                }
+            });
+            console.log(res_time);
+            rooms.forEach(async room => {
+                const res = await Room.findOne({
+                    where: {
+                        name: room
+                    }
+                });
+                let res_chair = await Default_Chair.findAll({
+                    where: {
+                        room_id: res.id
+                    }
+                });
+                for(let i = 0; i < res_chair.length; i++) {
+                    for(let j = 0; j < res_time.length; j++) {
+                        await Default_Room.create({
+                            film_id: film.id,
+                            // room_id: res.id,
+                            showtime_id: res_time[j].id,
+                            def_chair_id: res_chair[i].id,
+                            random: uuidv4()
+                        });
+                    }
+                } 
+                // await Default_Room.bulkCreate(res_time.map(item => ({
+                //     film_id: film.id,
+                //     room_id: res.id,
+                //     showtime_id: item.id,
+                //     random: uuidv4()
+                // })));
+            }); 
             // const data = await Film.findOne({
             //     where: {
             //         id: film.dataValues.id,
@@ -448,8 +520,8 @@ module.exports = {
                 data: {
                     film,
                     result_actor,
-                    result_showtime
-                },
+                    result_showtime,
+                }
             });
         } catch (error) {
             res.status(500).json({

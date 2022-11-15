@@ -3,7 +3,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    await queryInterface.createTable('default_actors', { 
+    await queryInterface.createTable('transactions', {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -14,21 +14,34 @@ module.exports = {
         type: Sequelize.STRING(100),
         allowNull: false,
       },
-      film_id: {
+      user_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'films',
+          model: 'users',
           key: 'id'
         }
       },
-      actor_id: {
+      def_room_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'actors',
+          model: 'default_rooms',
           key: 'id'
         }
+      },
+      equity: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+      },
+      total: {
+        type: Sequelize.FLOAT,
+        allowNull: false,
+      },
+      status: {
+        type: Sequelize.ENUM('pending', 'success', 'failed'),
+        allowNull: false,
+        defaultValue: 'pending'
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -42,6 +55,6 @@ module.exports = {
   },
 
   async down (queryInterface, Sequelize) {
-    await queryInterface.dropTable('default_actors');
+    await queryInterface.dropTable('transactions');
   }
 };

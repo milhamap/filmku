@@ -160,12 +160,11 @@
         },
         beforeCreate(){
             const route = useRoute()
-            const random = route.params.id;
             // console.log(random);
             axios.get('http://localhost:9000/films/' + route.params.id)
                 .then((response) => {
                     this.films = response.data.data
-                    console.log(this.films)
+                    // console.log(this.films)
                 })
                 .catch((error) => {
                     console.log(error)
@@ -185,7 +184,7 @@
             const formatActor = (value) => {
                 let actors = '';
                 value.map((item) => {
-                    actors += item.actor + ', '
+                    actors += item.name + ', '
                 })
                 return actors
             }

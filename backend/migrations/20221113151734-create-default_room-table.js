@@ -22,14 +22,14 @@ module.exports = {
           key: 'id'
         }
       },
-      room_id: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        references: {
-          model: 'rooms',
-          key: 'id'
-        }
-      },
+      // room_id: {
+      //   type: Sequelize.INTEGER,
+      //   allowNull: false,
+      //   references: {
+      //     model: 'rooms',
+      //     key: 'id'
+      //   }
+      // },
       showtime_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -37,6 +37,19 @@ module.exports = {
           model: 'showtimes',
           key: 'id'
         }
+      },
+      def_chair_id: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+            model: 'default_chairs',
+            key: 'id'
+        }
+      },
+      booking: {
+          type: Sequelize.BOOLEAN,
+          allowNull: false,
+          defaultValue: false
       },
       createdAt: {
         type: Sequelize.DATE,

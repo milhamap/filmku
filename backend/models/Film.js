@@ -85,21 +85,17 @@ module.exports = (sequelize, DataTypes) => {
             foreignKey: 'film_id',
             as: 'ratings'
         });
-        Film.hasMany(models.Actor, {
+        Film.hasMany(models.Showtime, {
             foreignKey: 'film_id',
-            as: 'actors'
-        });
-        Film.hasMany(models.Transaction, {
-            foreignKey: 'film_id',
-            as: 'transactions'
+            as: 'showtimes'
         });
         Film.hasMany(models.Default_Room, {
             foreignKey: 'film_id',
             as: 'default_rooms'
         });
-        Film.hasMany(models.Default_Actor, {
+        Film.hasMany(models.Actor, {
             foreignKey: 'film_id',
-            as: 'default_actors'
+            as: 'actors'
         });
     };
     return Film;

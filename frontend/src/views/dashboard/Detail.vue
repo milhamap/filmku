@@ -246,28 +246,33 @@
                                                             <span class="sr-only">Close modal</span>
                                                         </button>
                                                         <div class="py-6 px-6 lg:px-8">
-                                                            <div class="justify-center items-center text-center mb-4 text-xl font-medium text-gray-900 dark:text-white ">Studio 1</div>
-                                                            <div class="justify-center items-center text-center mb-4 text-xl font-medium text-gray-900 dark:text-white bg-gray-300 w-full h-[40px] pt-1 ">Layar</div>
-                                                            <form action="#">
-                                                                <!-- <div class="flex flex-wrap gap-2 justify-between">
-                                                                    <div v-for="chair in chairs" :key="chair.id" class="bg-gray-300 w-[40px] h-[40px] text-center">
-                                                                        <input type="checkbox" class="hidden peer">
-                                                                        <label for="react-option" class="rounded-lg border-4 border-gray-200 cursor-pointer peer-checked:border-blue-600">                           
-                                                                        </label>
-                                                                        {{chair.name}}
-                                                                    </div>
-                                                                </div> -->
-                                                                <ul class="grid gap-2 w-full md:grid-cols-7">
-                                                                    <li v-for="chair in chairs" :key="chair.id" class="g-gray-300 text-center">
-                                                                        <input type="checkbox" :id="chair.id" :value="chair.id" class="hidden peer" required="">
-                                                                        <label :for="chair.id" class="p-1.5 rounded-lg border-4 border-gray-200 cursor-pointer peer-checked:border-blue-600 text-sm">{{chair.name}}                           
-                                                                        </label>
+                                                            <form @submit.prevent="createTransaction">
+                                                                <select v-model="room_id" id="room_option" class=" my-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 font-bold text-center text-uppercase block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                                                    <!-- <option selected>Pilih Ruangan</option> -->
+                                                                    <option v-for="room in forms.rooms" :key="room.id" v-bind:value="room.id">{{room.name}}</option>
+                                                                </select>
+                                                                <div class="justify-center items-center text-center mb-4 text-xl font-medium text-gray-900 dark:text-white bg-gray-300 w-full h-[40px] pt-1 ">Layar</div>
+                                                                <ul class="grid gap-2 w-full md:grid-cols-7" v-if="selected !== null">
+                                                                    <li v-for="select in selected">
+                                                                        <div v-if="select.booking === true">
+                                                                            <input type="checkbox" class="hidden peer">
+                                                                            <label class="p-1.5 rounded-lg border-4 border-gray-200 cursor-pointer border-green-400 text-sm">{{select.default_chair.chair.name}}                           
+                                                                            </label>
+                                                                        </div>
+                                                                        <div v-if="select.booking === false">
+                                                                            <input v-model="chair_id" type="checkbox" :id="select.default_chair.chair.id" v-bind:value="select.default_chair.chair.id" class="hidden peer">
+                                                                            <label :for="select.default_chair.chair.id" class="p-1.5 rounded-lg border-4 border-gray-200 cursor-pointer peer-checked:border-blue-600 text-sm">{{select.default_chair.chair.name}}
+                                                                            </label>
+                                                                        </div>
                                                                     </li>
                                                                 </ul>
-                                                                <select id="options" class=" my-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                                                                    <option selected>Pilih Jam Tayang</option>
-                                                                    <option v-for="showtime in showtimes" :key="showtime.id" :value="showtime.id">{{showtime.showtimes}}</option>
-                                                                </select>                            
+                                                                <ul v-else>
+
+                                                                </ul>
+                                                                <select v-model="showtime_id" id="options" class=" my-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                                                    <option disabled selected>Pilih Jam Tayang</option>
+                                                                    <option v-for="showtime in forms.showtimes" :key="showtime.id" v-bind:value="showtime.id">{{showtime.showtimes}}</option>
+                                                                </select>
                                                                 <button type="submit" class="w-25 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-2 py-2.5 mt-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Checkout</button>
                                                             </form>
                                                         </div>
@@ -285,7 +290,7 @@
                             <div class="text-xl text-white">About</div>
                             <p class="max-w-[700px] mt-[10px] text-white text-base leading-8">
                                 {{movie.film.description}}
-                            </p>                    
+                            </p> 
                         </div>
                     </div>
                 </div>
@@ -321,18 +326,11 @@ import { useRoute } from "vue-router"
             return {
                 user: ref(null),
                 movie: ref(null),
-                chairs: ref([]),
-                showtimes: ref([]),
-                result: ref([])
-                // value: [],
-                // options: [
-                //     { name: 'Vue.js', language: 'JavaScript' },
-                //     { name: 'Adonis', language: 'JavaScript' },
-                //     { name: 'Rails', language: 'Ruby' },
-                //     { name: 'Sinatra', language: 'Ruby' },
-                //     { name: 'Laravel', language: 'PHP' },
-                //     { name: 'Phoenix', language: 'Elixir' }
-                // ]
+                forms: ref(null),
+                selected: ref(null),
+                room_id: '',
+                chair_id: [],
+                showtime_id: ''
             }
         },
         mounted() {
@@ -359,18 +357,46 @@ import { useRoute } from "vue-router"
                     })
                 })
             })
-
+            const room_option = document.getElementById('room_option')
             const option = document.getElementById('options')
             option.addEventListener('change', () => {
                 // const id = option.value
-                axios.get(`http://localhost:9000/films`)
-                    .then(res => {
-                        console.log(res);
+                // console.log(room_option.value)
+                // console.log(option.value)
+                axios.get(`http://localhost:9000/transactions/${option.value}/${room_option.value}/${this.$route.params.id}`, {
+                    headers: {
+                        'Authorization': 'Bearer ' + this.$cookies.get('token')
+                    }
+                })
+                    .then(response => {
+                        this.selected = response.data.data.default_room
+                        console.log(response.data.data.default_room);
+                        // console.log(this.selected);
                         // this.chairs = res.data.chairs
                         // this.showtimes = res.data.showtimes
                     })
-                    .catch(err => {
-                        console.log(err)
+                    .catch(error => {
+                        console.log(error)
+                    })
+            })
+            room_option.addEventListener('change', () => {
+                // const id = option.value
+                // console.log(room_option.value)
+                // console.log(option.value)
+                axios.get(`http://localhost:9000/transactions/${option.value}/${room_option.value}/${this.$route.params.id}`, {
+                    headers: {
+                        'Authorization': 'Bearer ' + this.$cookies.get('token')
+                    }
+                })
+                    .then(response => {
+                        this.selected = response.data.data.default_room
+                        console.log(response.data.data.default_room);
+                        // console.log(this.selected);
+                        // this.chairs = res.data.chairs
+                        // this.showtimes = res.data.showtimes
+                    })
+                    .catch(error => {
+                        console.log(error)
                     })
             })
             // chair.addEventListener("click", function () {
@@ -398,32 +424,20 @@ import { useRoute } from "vue-router"
             closeModal.addEventListener("click", function () {
                 modal.classList.add("hidden");
             })
-            axios.get('http://localhost:9000/showtimes/' + this.$route.params.id, {
+            },
+        beforeCreate() {
+            axios.get('http://localhost:9000/transactions/' + this.$route.params.id, {
                 headers: {
                     'Authorization': 'Bearer ' + this.$cookies.get('token')
                 }
             })
                 .then(response => {
-                    this.showtimes = response.data.data
+                    this.forms = response.data.data
                     console.log(response.data.data)
                 })
                 .catch(error => {
                     console.log(error)
                 })
-
-        },
-        beforeCreate() {
-            axios.get('http://localhost:9000/chairs', {
-                headers: {
-                    'Authorization': 'Bearer ' + this.$cookies.get('token')
-                }
-            }).then((response) => {
-                this.chairs = response.data.data
-                // console.log(this.chairs)
-            })
-            .catch((error) => {
-                console.log(error)
-            })
             axios.get("http://localhost:9000/auth/", {
                 headers: {
                     Authorization: `Bearer ${this.$cookies.get("token")}`
@@ -459,7 +473,7 @@ import { useRoute } from "vue-router"
             const formatActor = (value) => {
                 let actors = '';
                 value.map((item) => {
-                    actors += item.actor + ', '
+                    actors += item.name + ', '
                 })
                 return actors
             }
@@ -485,16 +499,23 @@ import { useRoute } from "vue-router"
             }
         },
         methods: {
-            async roomShowtime () {
-                await axios.get('http://localhost:9000/films')
-                    .then((response) => {
-                        // this.result = response.data.data
-                        console.log(response)
-                    })
-                    .catch((error) => {
-                        console.log(error)
-                    })
+            async createTransaction () {
+                await axios.post('http://localhost:9000/transactions/' + this.$route.params.id, {
+                    room_id: this.room_id,
+                    showtime_id: this.showtime_id,
+                    chair_id: this.chair_id,
+                }, {
+                    headers: {
+                        'Authorization': 'Bearer ' + this.$cookies.get('token')
+                    },
+                })
+                .then(response => {
+                    console.log(response)
+                })
+                .catch(error => {
+                    console.log(error)
+                })
             }
-        },
+        }
     }
 </script>

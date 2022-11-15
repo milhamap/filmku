@@ -20,14 +20,14 @@ module.exports = (sequelize, DataTypes) => {
                 key: 'id'
             }
         },
-        room_id: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            references: {
-              model: 'rooms',
-              key: 'id'
-            }
-        },
+        // room_id: {
+        //     type: DataTypes.INTEGER,
+        //     allowNull: false,
+        //     references: {
+        //       model: 'rooms',
+        //       key: 'id'
+        //     }
+        // },
         showtime_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
@@ -35,6 +35,19 @@ module.exports = (sequelize, DataTypes) => {
               model: 'showtimes',
               key: 'id'
             }
+        },
+        def_chair_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: {
+                model: 'default_chairs',
+                key: 'id'
+            }
+        },
+        booking: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false
         },
         createdAt: {
             type: DataTypes.DATE,
@@ -49,10 +62,10 @@ module.exports = (sequelize, DataTypes) => {
     });
     Default_Room.associate = function(models) {
         // associations can be defined here
-        Default_Room.belongsTo(models.Room, {
-            foreignKey: 'room_id',
-            as: 'room'
-        });
+        // Default_Room.belongsTo(models.Room, {
+        //     foreignKey: 'room_id',
+        //     as: 'room'
+        // });
         Default_Room.belongsTo(models.Showtime, {
             foreignKey: 'showtime_id',
             as: 'showtime'
@@ -60,6 +73,14 @@ module.exports = (sequelize, DataTypes) => {
         Default_Room.belongsTo(models.Film, {
             foreignKey: 'film_id',
             as: 'film'
+        });
+        Default_Room.belongsTo(models.Default_Chair, {
+            foreignKey: 'def_chair_id',
+            as: 'default_chair'
+        });
+        Default_Room.hasMany(models.Transaction, {
+            foreignKey: 'def_room_id',
+            as: 'transactions'
         });
     }
     return Default_Room;

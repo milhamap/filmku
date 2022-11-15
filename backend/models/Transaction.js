@@ -12,14 +12,6 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING(100),
             allowNull: false,
         },
-        film_id: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            references: {
-              model: 'films',
-              key: 'id'
-            }
-        },
         user_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
@@ -28,29 +20,26 @@ module.exports = (sequelize, DataTypes) => {
               key: 'id'
             }
         },
-        showtime_id: {
+        def_room_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-              model: 'showtimes',
-              key: 'id'
+                model: 'default_rooms',
+                key: 'id'
             }
         },
-        room_id: {
+        equity: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            references: {
-              model: 'rooms',
-              key: 'id'
-            }
         },
-        chair_id: {
-            type: DataTypes.INTEGER,
+        total: {
+            type: DataTypes.FLOAT,
             allowNull: false,
-            references: {
-              model: 'chairs',
-              key: 'id'
-            }
+        },
+        status: {
+            type: DataTypes.ENUM('pending', 'success', 'failed'),
+            allowNull: false,
+            defaultValue: 'pending'
         },
         createdAt: {
             type: DataTypes.DATE,
@@ -61,29 +50,17 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false
         },
     }, {
-        tableName: 'roles',
+        tableName: 'transactions',
     });
     Transaction.associate = (models) => {
         // associations can be defined here
-        Transaction.belongsTo(models.Film, {
-            foreignKey: 'film_id',
-            as: 'film',
-        });
         Transaction.belongsTo(models.User, {
             foreignKey: 'user_id',
             as: 'user',
         });
-        Transaction.belongsTo(models.Showtime, {
-            foreignKey: 'showtime_id',
-            as: 'showtime',
-        });
-        Transaction.belongsTo(models.Room, {
-            foreignKey: 'room_id',
-            as: 'room',
-        });
-        Transaction.belongsTo(models.Chair, {
-            foreignKey: 'chair_id',
-            as: 'chair',
+        Transaction.belongsTo(models.Default_Room, {
+            foreignKey: 'def_room_id',
+            as: 'default_room',
         });
     };
     return Transaction;
