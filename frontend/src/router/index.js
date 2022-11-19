@@ -51,6 +51,31 @@ const routes = [
         name: 'BioskopDashboard.Create',
         component: () => import('../views/Film/Create.vue')
     },
+    {
+        path: '/bioskop/transaction',
+        name: 'Transaction.Customer',
+        component: () => import('../views/Film/Transaction.vue')
+    },
+    {
+        path: '/bioskop/transaction/bukti/:id',
+        name: 'Transaction.Bukti',
+        component: () => import('../views/Film/Images.vue')
+    },
+    {
+        path: '/bioskop/rooms',
+        name: 'Room.Bioskop',
+        component: () => import('../views/FIlm/Room/Index.vue')
+    },
+    {
+        path: '/bioskop/rooms/create',
+        name: 'RoomBioskop.Create',
+        component: () => import('../views/FIlm/Room/Create.vue')
+    },
+    {
+        path: '/bioskop/rooms/edit/:id',
+        name: 'RoomBioskop.Edit',
+        component: () => import('../views/FIlm/Room/Edit.vue')
+    },
     // {
     //     path: '/dashboard/favorite/detail/:id',
     //     name: 'Dashboard.DetailFavorite',

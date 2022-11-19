@@ -356,6 +356,137 @@ module.exports = {
             console.log(error);
         }
     },
+    getTransaction: async (req, res) => {
+        try {
+            const film = await Film.findAll({
+                where: {
+                    user_id: userId
+                },
+            })
+            if(film.length !== 0) {
+                const default_room = await Default_Room.findAll({
+                    where: {
+                        film_id: {
+                            [Op.in]: film.map(film => film.id)
+                        }
+                    }
+                });
+                const transaction = await Transaction.findAll({
+                    where: {
+                        def_room_id: {
+                            [Op.in]: default_room.map(default_room => default_room.id)
+                        }
+                    },
+                    include: [
+                        {
+                            model: Default_Room,
+                            as: 'default_room',
+                            attributes: {
+                                exclude: ['createdAt', 'updatedAt']
+                            },
+                            include: [
+                                {
+                                    model: Showtime,
+                                    as: 'showtime',
+                                    attributes: {
+                                        exclude: ['createdAt', 'updatedAt']
+                                    }
+                                },
+                                {
+                                    model: Default_Chair,
+                                    as: 'default_chair',
+                                    attributes: {
+                                        exclude: ['createdAt', 'updatedAt']
+                                    },
+                                    include: [
+                                        {
+                                            model: Chair,
+                                            as: 'chair',
+                                            attributes: {
+                                                exclude: ['createdAt', 'updatedAt']
+                                            }
+                                        },
+                                        {
+                                            model: Room,
+                                            as: 'room',
+                                            attributes: {
+                                                exclude: ['createdAt', 'updatedAt']
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    model: Film,
+                                    as: 'film',
+                                    attributes: {
+                                        exclude: ['createdAt', 'updatedAt']
+                                    },
+                                    include: [
+                                        {
+                                            model: Genre,
+                                            as: 'genres',
+                                            attributes: {
+                                                exclude: ['createdAt', 'updatedAt']
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            model: DetailTransaction,
+                            as: 'detail_transactions',
+                            attributes: {
+                                exclude: ['createdAt', 'updatedAt']
+                            },
+                        }
+                    ]
+                });
+                res.json({
+                    message: 'Transaction successfully retrieved',
+                    data: transaction
+                })
+            }
+        } catch (error) {
+            res.status(404).json({
+                message: error.message
+            });
+            console.log(error);
+        }
+    },
+    updateStatusTransaction: async (req, res) => {
+        const { random } = req.params;
+        const { status } = req.body;
+        try {
+            const transaction = await Transaction.findOne({
+                where: {
+                    random: random
+                }
+            });
+            if(transaction) {
+                const update = await Transaction.update({
+                    status: status
+                }, {
+                    where: {
+                        random: random
+                    }
+                });
+                res.json({
+                    message: 'Transaction successfully updated',
+                    data: transaction
+                })
+            } else {
+                res.status(400).json({
+                    message: 'Transaction not found'
+                })
+            }
+        } catch(error) {
+            res.status(404).json({
+                message: error.message
+            });
+            console.log(error);
+        }
+    },
     deleteTransaction: async (req, res) => {
         const { random } = req.params;
         try {

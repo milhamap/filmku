@@ -7,7 +7,7 @@
                     <img src="../../../public/images/stream.svg" alt="">
                 </a>
                 <div class="links flex flex-col mt-16 gap-2">
-                    <router-link :to="{name: 'Bioskop.Dashboard'}" class="side-link active bg-sky-800 font-semibold text-white flex items-center w-full p-3 rounded-2xl gap-[10px]">
+                    <router-link :to="{name: 'Bioskop.Dashboard'}" class="side-link flex items-center font-normal text-stream-gray text-base w-full p-3 rounded-2xl gap-[10px] transition-all text-white">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             xmlns="http://www.w3.org/2000/svg">
                             <path d="M2 17L12 22L22 17" stroke-width="2" stroke-linecap="round"
@@ -19,7 +19,7 @@
                         </svg>
                         My Film
                     </router-link>
-                    <router-link :to="{name: 'Transaction.Customer'}" class="side-link flex items-center font-normal text-stream-gray text-base w-full p-3 rounded-2xl gap-[10px] transition-all text-white">
+                    <router-link :to="{name: 'Transaction.Customer'}" class="side-link active bg-sky-800 font-semibold text-white flex items-center w-full p-3 rounded-2xl gap-[10px]">
                         <i class="pi pi-history fs-5"></i>
                         Transaction Customer
                     </router-link>
@@ -107,7 +107,7 @@
                 <div class="flex justify-between items-center">
                     <div class="flex flex-col gap-[10px]">
                         <div class="font-bold text-[32px] text-white">
-                            Create Film
+                            Transaction Customer
                         </div>
                         <p class="mb-0 text-stream-gray text-base">Our selected movies for your mood</p>
                     </div>
@@ -125,7 +125,7 @@
                             </button>
                             <div class="bg-white rounded-2xl text-stream-dark font-medium flex flex-col gap-1 absolute z-[999] right-0 top-[80px] min-w-[180px] hidden overflow-hidden"
                                 id="dropdown-stream">
-                                <a href="dashboard.html" class="transition-all hover:bg-sky-100 p-3">My Film</a>
+                                <a :to="{name: 'Dashboard'}" class="transition-all hover:bg-sky-100 p-3 cursor-pointer">Watch</a>
                                 <a href="#!" class="transition-all hover:bg-sky-100 p-3">Settings</a>
                                 <a @click="logout" class="transition-all hover:bg-sky-100 p-3 cursor-pointer">Sign Out</a>
                             </div>
@@ -134,78 +134,88 @@
                 </div>
                 <!-- /Navbar -->
 
-                <!-- Featured -->
-                <div>
-                    <router-link :to="{name: 'Bioskop.Dashboard'}">
-                        <img src="../../../public/images/ic_arrow-left-normal.svg" alt="">
-                    </router-link>
-                    <form @submit.prevent="CreateFilm" class="mt-4 flex flex-col bg-white p-[30px] rounded-2xl gap-6">
-                        <div class="row">
-                            <div class="col-6 form-input flex flex-col gap-3 mt-2">
-                                <label for="title" class="text-base font-medium text-stream-dark">Title</label>
-                                <input id="title" type="text" v-model="title"
-                                class="rounded-full py-3 pr-3 pl-6 text-stream-dark     placeholder:text-stream-gray placeholder:font-normal font-medium outline outline-stream-gray outline-1 text-base focus:outline-indigo-600 input-stream"
-                                placeholder="Your email address" />
+                <!-- Table -->
+                <div class="flex flex-col">
+                    <div class="overflow-x-auto sm:-mx-6 lg:-mx-8">
+                        <div class="py-4 inline-block w-full sm:px-6 lg:px-8">
+                            <div class="overflow-hidden rounded-lg">
+                                <table class="w-full text-center">
+                                    <thead class="border-b bg-gray-300">
+                                        <tr>
+                                            <th scope="col" class="text-sm font-medium text-gray-900 px-6 py-4">
+                                                No
+                                            </th>
+                                            <th scope="col" class="text-sm font-medium text-gray-900 px-6 py-4">
+                                                Title
+                                            </th>
+                                            <th scope="col" class="text-sm font-medium text-gray-900 px-6 py-4">
+                                                Genre
+                                            </th>
+                                            <!-- <th scope="col" class="text-sm font-medium text-gray-900 px-6 py-4">
+                                                Equity
+                                            </th> -->
+                                            <th scope="col" class="text-sm font-medium text-gray-900 px-6 py-4">
+                                                Total
+                                            </th>
+                                            <th scope="col" class="text-sm font-medium text-gray-900 px-6 py-4">
+                                                Booking Date
+                                            </th>
+                                            <th scope="col" class="text-sm font-medium text-gray-900 px-6 py-4">
+                                                Room
+                                            </th>
+                                            <th scope="col" class="text-sm font-medium text-gray-900 px-6 py-4">
+                                                Seat
+                                            </th>
+                                            <th scope="col" class="text-sm font-medium text-gray-900 px-6 py-4">
+                                                Action
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(history, index) in histories" :key="index" class="bg-gray-300 border-b">
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{index+1}}</td>
+                                            <td class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                                                {{history.default_room.film.title}}
+                                            </td>
+                                            <td class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                                                {{history.default_room.film.genres.name}}
+                                            </td>
+                                            <!-- <td class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                                                {{history.equity}}
+                                            </td> -->
+                                            <td class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                                                {{history.total}}
+                                            </td>
+                                            <td class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                                                {{ new Date(history.booking_date).toDateString().split(' ')[2] + ' ' + new Date(history.booking_date).toDateString().split(' ')[1] + ' ' + new Date(history.booking_date).toDateString().split(' ')[3] }} : {{history.default_room.showtime.showtimes}}
+                                            </td>
+                                            <td class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                                                {{history.default_room.default_chair.room.name}}
+                                            </td>
+                                            <td class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                                                {{history.default_room.default_chair.chair.name}}
+                                            </td>
+                                            <td class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap" v-if="history.detail_transactions !== null">
+                                                <button v-if="history.status === 'failed'" class="bg-red-500 text-white px-3 mx-1 py-2 rounded-md">Ditolak</button>
+                                                <router-link v-if="history.status === 'pending'" class="bg-green-400 text-white px-3 mx-1 py-2 rounded-md" :to="{name: 'Transaction.Bukti', params: {id: history.detail_transactions.image}}">Lihat</router-link>
+                                                <button v-if="history.status === 'success'" class="bg-green-400 text-white px-3 mx-1 py-2 rounded-md">Success</button>
+                                                <div class="mt-3 flex" v-if="history.status === 'pending'">
+                                                    <form @submit.prevent="updateSuccess(history.random)" class="items-center text-center">
+                                                        <button class="bg-green-400 text-white px-3 mx-1 py-2 rounded-md">Confirm</button>
+                                                    </form>
+                                                    <form @submit.prevent="updateFailed(history.random)" class="items-center text-center">
+                                                        <button class="bg-red-500 text-white px-3 mx-1 py-2 rounded-md">Tolak</button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
-                            <div class="col-3 form-input flex flex-col gap-3 mt-2">
-                                <label for="price" class="text-base font-medium text-stream-dark">Price</label>
-                                <input id="price" type="number" v-model="price"
-                                class="rounded-full py-3 pr-3 pl-6 text-stream-dark     placeholder:text-stream-gray placeholder:font-normal font-medium outline outline-stream-gray outline-1 text-base focus:outline-indigo-600 input-stream"
-                                placeholder="Your email address" />
-                            </div>
-                            <div class="col-3 form-input flex flex-col gap-3 mt-2">
-                                <label for="duration" class="text-base font-medium text-stream-dark">Duration</label>
-                                <input id="duration" type="number" v-model="duration"
-                                class="rounded-full py-3 pr-3 pl-6 text-stream-dark     placeholder:text-stream-gray placeholder:font-normal font-medium outline outline-stream-gray outline-1 text-base focus:outline-indigo-600 input-stream"
-                                placeholder="Your email address" />
-                            </div>
-                            <div class="col-12 form-input flex flex-col gap-3 mt-2">
-                                <label for="description" class="block text-sm font-medium text-gray-900 dark:text-white">Description</label>
-                                <textarea id="description" v-model="description" rows="4" class="block p-2.5 w-full text-stream-dark  bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 outline outline-stream-gray outline-1 text-base focus:outline-indigo-600 input-stream" placeholder="Write your thoughts here..."></textarea>
-                            </div>
-                            <div class="col-3 form-input flex flex-col gap-3 mt-2">
-                                <label for="release_date" class="text-base font-medium text-stream-dark">Release Date</label>
-                                <input id="release_date" v-model="release_date" type="date" class="py-3 pr-3 pl-6 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date">
-                            </div>
-                            <div class="col-3 form-input flex flex-col gap-3 mt-2">
-                                <label for="expire_date" class="text-base font-medium text-stream-dark">Expire Date</label>
-                                <input id="expire_date" v-model="expire_date" type="date" class="py-3 pr-3 pl-6 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date">
-                            </div>
-                            <div class="col-3 form-input flex flex-col gap-3 mt-2">
-                                <label for="genre_id" class="text-base font-medium text-stream-dark">Genre</label>
-                                <select id="genre_id" v-model="genre_id" class="py-3 pr-3 pl-6 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                                    <option v-for="genre in genres" :key="genre.id" v-bind:value="genre.id">{{genre.name}}</option>
-                                </select>
-                            </div>
-                            <div class="col-3 form-input flex flex-col gap-3 mt-2">
-                                <label for="rooms" class="text-base font-medium text-stream-dark">Room</label>
-                                <select id="rooms" v-model="rooms" class="py-3 pr-3 pl-6 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                                    <option v-for="room in roomsku" :key="room.id" v-bind:value="room.name">{{room.name}}</option>
-                                </select>
-                            </div>
-                            <div class="col-3 form-input flex flex-col gap-3 mt-2">
-                                <label for="showtimes" class="text-base font-medium text-stream-dark">Showtime</label>
-                                <input id="showtimes" type="time" v-model="showtimes"
-                                class="rounded-full py-3 pr-3 pl-6 text-stream-dark placeholder:text-stream-gray placeholder:font-normal font-medium outline outline-stream-gray outline-1 text-base focus:outline-indigo-600 input-stream"
-                                placeholder="Your email address" />
-                            </div>
-                            <div class="col-3 form-input flex flex-col gap-3 mt-2">
-                                <label for="actors" class="text-base font-medium text-stream-dark">Actor</label>
-                                <input id="actors" type="text" v-model="actors"
-                                class="rounded-full py-3 pr-3 pl-6 text-stream-dark placeholder:text-stream-gray placeholder:font-normal font-medium outline outline-stream-gray outline-1 text-base focus:outline-indigo-600 input-stream"
-                                placeholder="Your email address" />
-                            </div>
-                            <div class="col-6 form-input flex flex-col gap-3 mt-2">
-                                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="file_input">Upload file</label>
-                                <input class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" id="file_input" @change="onSelect" ref="file" type="file">
-                            </div>
-                            <button type="submit" class="bg-indigo-600 rounded-full py-3 mt-4 text-center hover:bg-indigo-300">
-                                <span class="font-semibold text-white text-base">Create Film</span>
-                            </button>
                         </div>
-                    </form>
+                    </div>
                 </div>
-                <!-- /Featured -->
+                <!-- /Table -->
             </div>
         </div>
         <!-- END: Content -->
@@ -227,32 +237,20 @@
 <script>
     import axios from "axios"
     import { ref } from "vue"
-    import { useToast } from "vue-toastification";
+    import { useToast } from "vue-toastification"
     export default {
-        data(){
+        data() {
             return {
                 user: ref(null),
-                movies: ref([]),
-                title: "",
-                price: "",
-                duration: "",
-                description: "",
-                release_date: "",
-                expire_date: "",
-                genre_id: "",
-                showtimes: "",
-                rooms: "",
-                actors: "",
-                file: "",
-                roomsku: ref([]),
-                genres: ref([])
+                histories: ref([]),
+                favorites: ref([]),
+                berhasil: "success",
+                gagal: "failed",
             }
         },
-        setup(){
-            const toast = useToast();
-            return {
-                toast
-            }
+        setup() {
+            const toast = useToast()
+            return { toast }
         },
         mounted() {
             $(document).ready(function () {
@@ -278,28 +276,16 @@
                     })
                 })
             })
-            axios.get('http://localhost:9000/rooms', {
+            axios.get('http://localhost:9000/transactions/get/all', {
                 headers: {
-                    Authorization: `Bearer ${this.$cookies.get('token')}`
+                    'Authorization': 'Bearer ' + this.$cookies.get('token')
                 }
-            })
-            .then((response) => {
-                this.roomsku = response.data.data
+            }).then((response) => {
+                this.histories = response.data.data
+                // console.log(this.histories)
                 console.log(response.data.data)
-            })
-            .catch((error) => {
-                console.log(error)
-            })
-            axios.get('http://localhost:9000/genres', {
-                headers: {
-                    Authorization: `Bearer ${this.$cookies.get('token')}`
-                }
-            })
-            .then((response) => {
-                this.genres = response.data
-                console.log(response.data)
-            })
-            .catch((error) => {
+            }).catch((error) => {
+                this.toast.error(error.response.data.message)
                 console.log(error)
             })
         },
@@ -313,7 +299,7 @@
                 // console.log(this.user);
             })
             .catch(err => {
-                this.toast.error("Please login first");
+                this.toast.error(err.response.data.message);
                 console.log(err);
             })
         },
@@ -321,53 +307,54 @@
             async logout() {
                 await axios.delete('http://localhost:9000/auth/logout')
                 .then(response => {
-                    // use toast and refresh page
-                    this.toast.success("Logout Success");
                     // console.log(response)
+                    this.toast.success("Logout Success")
                     this.$cookies.remove('token')
                     this.$router.push({ name: 'Home' })
                     // localStorage.removeItem('token')
                     // this.$router.push({ name: 'Login' })
                 })
                 .catch(error => {
-                    this.toast.error(error.response.data.message);
+                    this.toast.error(error.response.data.message)
                     console.log(error)
                 })
             },
-            onSelect(event) {
-                const file = event.target.files[0]
-                // console.log(file)
-                this.file = file
-            },
-            async CreateFilm () {
-                const formData = new FormData()
-                formData.append('title', this.title)
-                formData.append('price', this.price)
-                formData.append('duration', this.duration)
-                formData.append('description', this.description)
-                formData.append('release_date', this.release_date)
-                formData.append('actors', this.actors)
-                formData.append('expire_date', this.expire_date)
-                formData.append('genre_id', this.genre_id)
-                formData.append('showtimes', this.showtimes)
-                formData.append('rooms', this.rooms)
-                formData.append('image', this.file)
-                await axios.post('http://localhost:9000/films', formData, {
+            async updateSuccess (random) {
+                await axios.put('http://localhost:9000/transactions/confirm/' + random, {
+                    status: this.berhasil,
+                }, {
                     headers: {
                         Authorization: `Bearer ${this.$cookies.get("token")}`
                     }
                 })
                 .then(response => {
-                    this.toast.success("Film Created");
-                    this.$router.go(-1);
                     console.log(response)
+                    this.toast.success(response.data.message)
+                    this.$router.go();
                 })
                 .catch(error => {
-                    this.toast.error(error.response.data.message);
+                    this.toast.error(error.response.data.message)
                     console.log(error)
                 })
-
+            },
+            async updateFailed (random) {
+                await axios.put('http://localhost:9000/transactions/confirm/' + random, {
+                    status: this.gagal,
+                }, {
+                    headers: {
+                        Authorization: `Bearer ${this.$cookies.get("token")}`
+                    }
+                })
+                .then(response => {
+                    console.log(response)
+                    this.toast.success(response.data.message)
+                    this.$router.go();
+                })
+                .catch(error => {
+                    this.toast.error(error.response.data.message)
+                    console.log(error)
+                })
             }
-        }
+        },
     }
 </script>
