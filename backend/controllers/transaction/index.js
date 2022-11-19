@@ -1,8 +1,9 @@
-const { Op, where } = require('sequelize');
+const { Op } = require('sequelize');
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
-const { Film, Room, Showtime, Default_Room, Chair, Default_Chair, Transaction } = require('../../models');
-
+const { Film, Room, Showtime, Default_Room, Chair, Default_Chair, Transaction, Genre, DetailTransaction } = require('../../models');
+// const { sequelize } = require('sequelize');
+let unique = 1;
 module.exports = {
     getDetail: async (req, res) => {
         const { random } = req.params;
@@ -190,7 +191,7 @@ module.exports = {
         }
     },
     createTransaction: async (req, res) => {
-        const { showtime_id, chair_id, room_id } = req.body;
+        const { showtime_id, chair_id, room_id, booking_date } = req.body;
         const { random } = req.params;
         try {
             const film = await Film.findOne({
@@ -234,13 +235,20 @@ module.exports = {
                 // const total = equity * film.price;
                 // console.log(default_room.length);
                 // console.log(chair_id.length * film.price);
+                if(booking_date > film.expire_date) {
+                    return res.status(400).json({
+                        message: 'Booking date is expired'
+                    });
+                }
                 const transaction = await Transaction.bulkCreate(default_room.map((def_room) => ({
                     random: uuidv4(),
                     user_id: userId,
                     def_room_id: def_room.id,
-                    equity: default_room.length,
-                    total: film.price
+                    equity: 1,
+                    total: film.price,
+                    booking_date: booking_date
                 })))
+                unique++;
                 res.json({
                     message: 'Transaction successfully created',
                     data: transaction,
@@ -252,6 +260,154 @@ module.exports = {
                 })
             }
         }catch(error) {
+            res.status(404).json({
+                message: error.message
+            });
+            console.log(error);
+        }
+    },
+    getTransactionByUserId: async (req, res) => {
+        try {
+            const transaction = await Transaction.findAll({
+                where: {
+                    user_id: userId
+                },
+                // attributes: [
+                //     [sequelize.fn('COUNT', sequelize.col('*')), 'total']
+                // ],
+                // group: ['Transaction.equity'],
+                // having: sequelize.literal(`COUNT(total) > 1`),
+                // order: [
+                //     ['id', 'ASC']
+                // ],
+                include: [
+                    {
+                        model: Default_Room,
+                        as: 'default_room',
+                        attributes: {
+                            exclude: ['createdAt', 'updatedAt']
+                        },
+                        include: [
+                            {
+                                model: Showtime,
+                                as: 'showtime',
+                                attributes: {
+                                    exclude: ['createdAt', 'updatedAt']
+                                }
+                            },
+                            {
+                                model: Default_Chair,
+                                as: 'default_chair',
+                                attributes: {
+                                    exclude: ['createdAt', 'updatedAt']
+                                },
+                                include: [
+                                    {
+                                        model: Chair,
+                                        as: 'chair',
+                                        attributes: {
+                                            exclude: ['createdAt', 'updatedAt']
+                                        }
+                                    },
+                                    {
+                                        model: Room,
+                                        as: 'room',
+                                        attributes: {
+                                            exclude: ['createdAt', 'updatedAt']
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                model: Film,
+                                as: 'film',
+                                attributes: {
+                                    exclude: ['createdAt', 'updatedAt']
+                                },
+                                include: [
+                                    {
+                                        model: Genre,
+                                        as: 'genres',
+                                        attributes: {
+                                            exclude: ['createdAt', 'updatedAt']
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        model: DetailTransaction,
+                        as: 'detail_transactions',
+                        attributes: {
+                            exclude: ['createdAt', 'updatedAt']
+                        },
+                    }
+                ]
+            });
+            res.json({
+                message: 'Transaction successfully retrieved',
+                data: transaction
+            })
+        } catch (error) {
+            res.status(404).json({
+                message: error.message
+            });
+            console.log(error);
+        }
+    },
+    deleteTransaction: async (req, res) => {
+        const { random } = req.params;
+        try {
+            const transaction = await Transaction.findOne({
+                where: {
+                    random
+                }
+            });
+            const default_room = await Default_Room.findOne({
+                where: {
+                    id: transaction.def_room_id
+                }
+            });
+            await Default_Room.update(
+                { booking: false },
+                { where: { id: default_room.id } }
+            );
+            await Transaction.destroy({
+                where: {
+                    random
+                }
+            });
+            res.json({
+                message: 'Transaction successfully deleted'
+            })
+        } catch (error) {
+            res.status(404).json({
+                message: error.message
+            });
+            console.log(error);
+        }
+    },
+    uploadBuktiTransaction: async (req, res) => {
+        const { random } = req.params;
+        try {
+            const transaction = await Transaction.findOne({
+                where: {
+                    random: random
+                }
+            });
+            console.log(req.file);
+            const upload = await DetailTransaction.create({ 
+                image: req.file.filename,
+                random: uuidv4(),
+                transaction_id: transaction.id,
+                status: true
+            });
+            res.json({
+                message: 'Bukti successfully uploaded',
+                data: upload
+            })
+        } catch (error) {
             res.status(404).json({
                 message: error.message
             });

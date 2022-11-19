@@ -26,13 +26,13 @@
                     </a>
                 </div>
 
-                <div class="pt-[85px] flex flex-col items-center gap-5 px-3">
+                <div class="pt-[65px] flex flex-col items-center gap-5 px-3">
                     <p class="text-sky-300 text-base font-semibold">
                         START SIGN IN
                     </p>
-                    <div class="font-bold text-white text-4xl lg:text-[45px] text-center capitalize leading-snug">
+                    <!-- <div class="font-bold text-white text-4xl lg:text-[45px] text-center capitalize leading-snug">
                         Order Movies
-                    </div>
+                    </div> -->
 
                     <!-- Form login -->
                     <section class="w-11/12 max-w-[460px]">
@@ -53,9 +53,9 @@
                                 <button type="submit" class="bg-indigo-600 rounded-full py-3 mt-4 text-center hover:bg-indigo-300">
                                     <span class="font-semibold text-white text-base">Login</span>
                                 </button>
-                                <a href="/" class="bg-indigo-600 rounded-full py-3 mt-4 text-center hover:bg-indigo-300">
+                                <router-link :to="{name: 'Register'}" class="bg-indigo-600 rounded-full py-3 mt-4 text-center hover:bg-indigo-300">
                                     <span class="font-semibold text-white text-base">Register</span>
-                                </a>
+                                </router-link>
                             </div>
                         </form>
                     </section>
@@ -74,6 +74,7 @@
 <script>
     import axios from 'axios'
     import { useRoute } from 'vue-router'
+    import { useToast } from "vue-toastification";
     export default {
         data() {
             return {
@@ -81,22 +82,43 @@
                 password: '',
             }
         },
+        setup() {
+            const route = useRoute()
+            const toast = useToast()
+            return {
+                route,
+                toast
+            }
+        },
+        beforeCreate() {
+            if (this.$cookies.isKey('token')) {
+                this.$router.go(-1) 
+            }
+        },
         methods: {
             async handlerLogin() {
-                const route = useRoute();
+                // const toast = useToast();
+                // const route = useRoute();
                 await axios.post('http://localhost:9000/auth/login', {
                     email: this.email,
                     password: this.password
                 })
                     .then(response => {
-                        // console.log(response)
+                        this.toast.success(response.data.message)
+                        this.$cookies.set('token', response.data.data.token)
+                        if(response.data.data.role.id === 3) 
+                            this.$router.push({ name: 'Dashboard' })
+                        else if (response.data.data.role.id === 2) 
+                            this.$router.push({ name: 'Bioskop.Dashboard' })
+                        else if (response.data.data.role.id === 1)
+                            this.$router.push({ name: 'Admin.Dashboard' })
+                        // console.log(respons)
                         // console.log(response.data.data.token)
                         // set cookies
-                        this.$cookies.set('token', response.data.data.token)
-                        // localStorage.se  tItem('token', response.data.data.token)
-                        this.$router.push({ name: 'Dashboard' })
+                        // use toast to show message
                     })
                     .catch(error => {
+                        this.toast.error("Email or password is wrong")
                         console.log(error)
                     })
             }

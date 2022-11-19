@@ -41,6 +41,10 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
             defaultValue: 'pending'
         },
+        booking_date: {
+            type: DataTypes.DATE,
+            allowNull: false,
+        },
         createdAt: {
             type: DataTypes.DATE,
             allowNull: false
@@ -61,6 +65,10 @@ module.exports = (sequelize, DataTypes) => {
         Transaction.belongsTo(models.Default_Room, {
             foreignKey: 'def_room_id',
             as: 'default_room',
+        });
+        Transaction.hasOne(models.DetailTransaction, {
+            foreignKey: 'transaction_id',
+            as: 'detail_transactions',
         });
     };
     return Transaction;

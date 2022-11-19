@@ -7,7 +7,7 @@
                     <img src="../../../public/images/stream.svg" alt="">
                 </a>
                 <div class="links flex flex-col mt-16 gap-2">
-                    <a href="dashboard.html" class="side-link active bg-sky-800 font-semibold text-white flex items-center w-full p-3 rounded-2xl gap-[10px]">
+                    <router-link :to="{name: 'Dashboard'}" class="side-link active bg-sky-800 font-semibold text-white flex items-center w-full p-3 rounded-2xl gap-[10px]">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             xmlns="http://www.w3.org/2000/svg">
                             <path d="M2 17L12 22L22 17" stroke-width="2" stroke-linecap="round"
@@ -18,21 +18,12 @@
                                 stroke-linejoin="round" />
                         </svg>
                         Watch
-                    </a>
-                    <a href="#!" class="side-link flex items-center font-normal text-stream-gray text-base w-full p-3 rounded-2xl gap-[10px] transition-all text-white">
-                        <svg width="24" height="24" class="group" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path
-                                d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                            <path d="M2 12H22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                            <path
-                                d="M12 2C14.5013 4.73835 15.9228 8.29203 16 12C15.9228 15.708 14.5013 19.2616 12 22C9.49872 19.2616 8.07725 15.708 8 12C8.07725 8.29203 9.49872 4.73835 12 2V2Z"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                        Discover
-                    </a>
-                    <a href="#!" class="side-link flex items-center font-normal text-stream-gray text-base w-full p-3 rounded-2xl gap-[10px] transition-all text-white">
+                    </router-link>
+                    <router-link :to="{name: 'Dashboard.History'}" class="side-link flex items-center font-normal text-stream-gray text-base w-full p-3 rounded-2xl gap-[10px] transition-all text-white">
+                        <i class="pi pi-history fs-5"></i>
+                        History
+                    </router-link>
+                    <router-link :to="{name: 'Dashboard.Favorite'}" class="side-link flex items-center font-normal text-stream-gray text-base w-full p-3 rounded-2xl gap-[10px] transition-all text-white">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             xmlns="http://www.w3.org/2000/svg">
                             <path
@@ -41,8 +32,8 @@
                         </svg>
                         My Favorites
                         <span
-                            class="bg-[#6EC2DF] text-[#1E5062] text-base rounded-full font-semibold text-center px-[7px] py-[1px]">6</span>
-                    </a>
+                            class="bg-[#6EC2DF] text-[#1E5062] text-base rounded-full font-semibold text-center px-[7px] py-[1px]">{{favorites.length}}</span>
+                    </router-link>
                     <a href="#!" class="side-link flex items-center font-normal text-stream-gray text-base w-full p-3 rounded-2xl gap-[10px] transition-all text-white">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             xmlns="http://www.w3.org/2000/svg">
@@ -134,7 +125,7 @@
                                 id="dropdown-stream">
                                 <a href="#" class="transition-all hover:bg-sky-100 p-3">Watch</a>
                                 <a href="#!" class="transition-all hover:bg-sky-100 p-3">Settings</a>
-                                <a href="#" class="transition-all hover:bg-sky-100 p-3">Sign Out</a>
+                                <a @click="logout" class="transition-all hover:bg-sky-100 p-3 cursor-pointer">Sign Out</a>
                             </div>
                         </div>
                     </div>
@@ -179,8 +170,8 @@
                                         <p class="text-warning ml-[10px]">{{formatActor(movie.film.actors)}}</p>
                                     </div>
                                 </p>
-                                <p class="text-white text-base mt-[6px]">
-                                    {{movie.film.genres.name}} - Release at {{ new Date(movie.film.release_date).toDateString().split(' ')[2] + ' ' + new Date(movie.film.release_date).toDateString().split(' ')[1] + ' ' + new Date(movie.film.release_date).toDateString().split(' ')[3] }}
+                                <p class="text-white opacity-60 text-base mt-[6px]">
+                                    {{movie.film.genres.name}} - Release at {{ new Date(movie.film.release_date).toDateString().split(' ')[2] + ' ' + new Date(movie.film.release_date).toDateString().split(' ')[1] + ' ' + new Date(movie.film.release_date).toDateString().split(' ')[3] }} - {{ new Date(movie.film.expire_date).toDateString().split(' ')[2] + ' ' + new Date(movie.film.expire_date).toDateString().split(' ')[1] + ' ' + new Date(movie.film.expire_date).toDateString().split(' ')[3] }}
                                 </p>
                             </div>
                             <div class="inline-flex items-center gap-[6px]">
@@ -269,11 +260,17 @@
                                                                 <ul v-else>
 
                                                                 </ul>
+                                                                <div class="relative w-50 float-right mb-2">
+                                                                    <div class="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
+                                                                        <svg aria-hidden="true" class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path></svg>
+                                                                    </div>
+                                                                    <input v-model="booking_date" required type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date">
+                                                                </div>
                                                                 <select v-model="showtime_id" id="options" class=" my-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                                                                     <option disabled selected>Pilih Jam Tayang</option>
                                                                     <option v-for="showtime in forms.showtimes" :key="showtime.id" v-bind:value="showtime.id">{{showtime.showtimes}}</option>
                                                                 </select>
-                                                                <button type="submit" class="w-25 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-2 py-2.5 mt-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Checkout</button>
+                                                                <button class="w-25 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-2 py-2.5 mt-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 checkout">Checkout</button>
                                                             </form>
                                                         </div>
                                                     </div>
@@ -321,6 +318,7 @@
 import axios from "axios"
 import { ref} from "vue"
 import { useRoute } from "vue-router"
+import { useToast } from "vue-toastification"
     export default {
         data() {
             return {
@@ -328,10 +326,21 @@ import { useRoute } from "vue-router"
                 movie: ref(null),
                 forms: ref(null),
                 selected: ref(null),
+                favorites: ref([]),
                 room_id: '',
                 chair_id: [],
-                showtime_id: ''
+                showtime_id: '',
+                booking_date: '',
+                // range: {
+                //     start: new Date(2022, 11, 5),
+                //     end: new Date(2022, 11, 16),
+                // }
             }
+        },
+        setup() {
+            // const route = useRoute()
+            const toast = useToast()
+            return { toast }
         },
         mounted() {
             $(document).ready(function () {
@@ -357,6 +366,8 @@ import { useRoute } from "vue-router"
                     })
                 })
             })
+            // const datepicker = document.getElementById('datetime');
+            // new DateRangePicker(datepicker)
             const room_option = document.getElementById('room_option')
             const option = document.getElementById('options')
             option.addEventListener('change', () => {
@@ -369,8 +380,10 @@ import { useRoute } from "vue-router"
                     }
                 })
                     .then(response => {
+                        // this.toast.success(response.data.message)
                         this.selected = response.data.data.default_room
-                        console.log(response.data.data.default_room);
+                        // this.$router.go()
+                        // console.log(response.data.data.default_room);
                         // console.log(this.selected);
                         // this.chairs = res.data.chairs
                         // this.showtimes = res.data.showtimes
@@ -390,7 +403,7 @@ import { useRoute } from "vue-router"
                 })
                     .then(response => {
                         this.selected = response.data.data.default_room
-                        console.log(response.data.data.default_room);
+                        // console.log(response.data.data.default_room);
                         // console.log(this.selected);
                         // this.chairs = res.data.chairs
                         // this.showtimes = res.data.showtimes
@@ -398,6 +411,18 @@ import { useRoute } from "vue-router"
                     .catch(error => {
                         console.log(error)
                     })
+            })
+            axios.get('http://localhost:9000/ratings/favorite', {
+                headers: {
+                    Authorization: `Bearer ${this.$cookies.get("token")}`
+                }
+            })
+            .then(res => {
+                this.favorites = res.data.data;
+                console.log(res.data.data);
+            })
+            .catch(err => {
+                console.log(err);
             })
             // chair.addEventListener("click", function () {
             //     chair.classList.remove("bg-gray-300")
@@ -417,6 +442,7 @@ import { useRoute } from "vue-router"
 
             const showModal = document.querySelector(".show-modal")
             const closeModal = document.querySelector(".close-modal")
+            const checkout = document.querySelector(".checkout")
 
             showModal.addEventListener("click", function () {
                 modal.classList.remove("hidden");
@@ -424,6 +450,9 @@ import { useRoute } from "vue-router"
             closeModal.addEventListener("click", function () {
                 modal.classList.add("hidden");
             })
+            // checkout.addEventListener("click", function () {
+            //     modal.classList.add("hidden");
+            // })
             },
         beforeCreate() {
             axios.get('http://localhost:9000/transactions/' + this.$route.params.id, {
@@ -433,7 +462,7 @@ import { useRoute } from "vue-router"
             })
                 .then(response => {
                     this.forms = response.data.data
-                    console.log(response.data.data)
+                    // console.log(response.data.data)
                 })
                 .catch(error => {
                     console.log(error)
@@ -500,9 +529,11 @@ import { useRoute } from "vue-router"
         },
         methods: {
             async createTransaction () {
+                const toast = useToast()
                 await axios.post('http://localhost:9000/transactions/' + this.$route.params.id, {
                     room_id: this.room_id,
                     showtime_id: this.showtime_id,
+                    booking_date: this.booking_date,
                     chair_id: this.chair_id,
                 }, {
                     headers: {
@@ -510,7 +541,27 @@ import { useRoute } from "vue-router"
                     },
                 })
                 .then(response => {
+                    toast.success('Transaksi Berhasil');
+                    this.$router.go(-1);
+                    // this.$router.push({name: 'Dashboard'})
+                    // this.$router.push({name: 'Dashboard.Detail', params: {id: this.$route.params.id}})
                     console.log(response)
+                })
+                .catch(error => {
+                    // this.toast.error(error.response.data.message)
+                    console.log(error)
+                })
+            },
+            async logout() {
+                const toast = useToast()
+                await axios.delete('http://localhost:9000/auth/logout')
+                .then(response => {
+                    // console.log(response)
+                    toast.success("Logout Success")
+                    this.$cookies.remove('token')
+                    this.$router.push({ name: 'Home' })
+                    // localStorage.removeItem('token')
+                    // this.$router.push({ name: 'Login' })
                 })
                 .catch(error => {
                     console.log(error)

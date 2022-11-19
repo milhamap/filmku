@@ -43,6 +43,10 @@ module.exports = {
         allowNull: false,
         defaultValue: 'pending'
       },
+      booking_date: {
+        type: Sequelize.DATE,
+        allowNull: false,
+      },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false

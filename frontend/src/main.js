@@ -3,6 +3,8 @@ import router from './router'
 import App from './App.vue'
 import vSelect from 'vue-select';
 import VueCookies from 'vue-cookies';
+import Toast from "vue-toastification";
+import "vue-toastification/dist/index.css";
 
 // import 'expose?$!expose?jQuery!jquery';
 import '../style.css'
@@ -27,6 +29,7 @@ const app = createApp(App)
 
 app.component('v-select', vSelect);
 
+app.use(Toast);
 app.use(VueCookies);
 app.use(router)
 app.mount('#app')

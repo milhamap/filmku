@@ -53,7 +53,7 @@
                                     </div>
                                 </p>
                                 <p class="text-white opacity-60 text-base mt-[6px]">
-                                    {{films.film.genres.name}} - Release at {{ new Date(films.film.release_date).toDateString().split(' ')[2] + ' ' + new Date(films.film.release_date).toDateString().split(' ')[1] + ' ' + new Date(films.film.release_date).toDateString().split(' ')[3] }}
+                                    {{films.film.genres.name}} - Release at {{ new Date(films.film.release_date).toDateString().split(' ')[2] + ' ' + new Date(films.film.release_date).toDateString().split(' ')[1] + ' ' + new Date(films.film.release_date).toDateString().split(' ')[3] }} - {{ new Date(films.film.expire_date).toDateString().split(' ')[2] + ' ' + new Date(films.film.expire_date).toDateString().split(' ')[1] + ' ' + new Date(films.film.expire_date).toDateString().split(' ')[3] }}
                                 </p>
                             </div>
                             <div class="inline-flex items-center gap-[6px]">

@@ -4,7 +4,7 @@ const { getGenre, getGenres, createGenre, updateGenre, deleteGenre } = require('
 const { verifyToken } = require('../middleware/verifyToken');
 const { isCustomer } = require('../middleware/');
 
-router.get('/', isCustomer, getGenres);
+router.get('/', verifyToken, getGenres);
 router.get('/:id', getGenre);
 router.post('/', verifyToken, createGenre);
 router.put('/:id', updateGenre);

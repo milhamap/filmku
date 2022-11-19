@@ -7,7 +7,7 @@
                     <img src="../../../public/images/stream.svg" alt="">
                 </a>
                 <div class="links flex flex-col mt-16 gap-2">
-                    <a href="dashboard.html" class="side-link active bg-sky-800 font-semibold text-white flex items-center w-full p-3 rounded-2xl gap-[10px]">
+                    <router-link :to="{name: 'Dashboard'}" class="side-link active bg-sky-800 font-semibold text-white flex items-center w-full p-3 rounded-2xl gap-[10px]">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             xmlns="http://www.w3.org/2000/svg">
                             <path d="M2 17L12 22L22 17" stroke-width="2" stroke-linecap="round"
@@ -18,21 +18,12 @@
                                 stroke-linejoin="round" />
                         </svg>
                         Watch
-                    </a>
-                    <a href="#!" class="side-link flex items-center font-normal text-stream-gray text-base w-full p-3 rounded-2xl gap-[10px] transition-all text-white">
-                        <svg width="24" height="24" class="group" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path
-                                d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                            <path d="M2 12H22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                            <path
-                                d="M12 2C14.5013 4.73835 15.9228 8.29203 16 12C15.9228 15.708 14.5013 19.2616 12 22C9.49872 19.2616 8.07725 15.708 8 12C8.07725 8.29203 9.49872 4.73835 12 2V2Z"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                        Discover
-                    </a>
-                    <a href="#!" class="side-link flex items-center font-normal text-stream-gray text-base w-full p-3 rounded-2xl gap-[10px] transition-all text-white">
+                    </router-link>
+                    <router-link :to="{name: 'Dashboard.History'}" class="side-link flex items-center font-normal text-stream-gray text-base w-full p-3 rounded-2xl gap-[10px] transition-all text-white">
+                        <i class="pi pi-history fs-5"></i>
+                        History
+                    </router-link>
+                    <router-link :to="{name: 'Dashboard.Favorite'}" class="side-link flex items-center font-normal text-stream-gray text-base w-full p-3 rounded-2xl gap-[10px] transition-all text-white">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             xmlns="http://www.w3.org/2000/svg">
                             <path
@@ -41,8 +32,8 @@
                         </svg>
                         My Favorites
                         <span
-                            class="bg-[#6EC2DF] text-[#1E5062] text-base rounded-full font-semibold text-center px-[7px] py-[1px]">6</span>
-                    </a>
+                            class="bg-[#6EC2DF] text-[#1E5062] text-base rounded-full font-semibold text-center px-[7px] py-[1px]">{{favorites.length}}</span>
+                    </router-link>
                     <a href="#!" class="side-link flex items-center font-normal text-stream-gray text-base w-full p-3 rounded-2xl gap-[10px] transition-all text-white">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             xmlns="http://www.w3.org/2000/svg">
@@ -214,14 +205,23 @@
 
 <script>
 import axios from "axios"
-import { ref} from "vue"
+import { ref } from "vue"
+import { useToast } from "vue-toastification";
+import VueJwtDecode from 'vue-jwt-decode';
 export default {
     data() {
         return {
             user: ref(null),
             movies: ref([]),
             films: ref([]),
-            genres: ref([])
+            genres: ref([]),
+            favorites: ref([])
+        }
+    },
+    setup() {
+        const toast = useToast();
+        return {
+            toast
         }
     },
     mounted() {
@@ -258,6 +258,7 @@ export default {
             // console.log(res.data.data);
         })
         .catch(err => {
+            this.toast.error(err.response.data.message);
             console.log(err);
         })
         axios.get('http://localhost:9000/films')
@@ -267,6 +268,20 @@ export default {
             // console.log(res.data.data);
         })
         .catch(err => {
+            this.toast.error(err.response.data.message);
+            console.log(err);
+        })
+        axios.get('http://localhost:9000/ratings/favorite', {
+            headers: {
+                Authorization: `Bearer ${this.$cookies.get("token")}`
+            }
+        })
+        .then(res => {
+            this.favorites = res.data.data;
+            // console.log(res.data.data);
+        })
+        .catch(err => {
+            this.toast.error(err.response.data.message);
             console.log(err);
         })
     },
@@ -277,9 +292,10 @@ export default {
             }
         }).then(res => {
             this.user = res.data.data
-            console.log(this.user);
+            // console.log(this.user);
         })
         .catch(err => {
+            this.toast.error("Please login first");
             console.log(err);
         })
     },
@@ -287,13 +303,16 @@ export default {
         async logout() {
             await axios.delete('http://localhost:9000/auth/logout')
             .then(response => {
-                console.log(response)
+                // use toast and refresh page
+                this.toast.success("Logout Success");
+                // console.log(response)
                 this.$cookies.remove('token')
                 this.$router.push({ name: 'Home' })
                 // localStorage.removeItem('token')
                 // this.$router.push({ name: 'Login' })
             })
             .catch(error => {
+                this.toast.error(error.response.data.message);
                 console.log(error)
             })
         }

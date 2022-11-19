@@ -13,6 +13,17 @@ module.exports = {
                     random: random
                 }
             });
+            const rate_user = await Rating.findOne({
+                where: {
+                    user_id: userId,
+                    film_id: film.id
+                }
+            });
+            if (rate_user) {
+                return res.status(400).json({
+                    message: 'You have rated this film'
+                });
+            }
             await Rating.create({
                 rate,
                 film_id: film.id,
@@ -42,6 +53,35 @@ module.exports = {
             });
         } catch (error) {
             console.log(error);
+        }
+    },
+    getFilmFavoriteById: async (req, res) => {
+        try {
+            const rating = await Rating.findAll({
+                where: {
+                    user_id: userId
+                },
+                include: [
+                    {
+                        model: Film,
+                        as: 'films',
+                        include: [
+                            {
+                                model: Genre,
+                                as: 'genres'
+                            },
+                        ]
+                    }
+                ]
+            });
+            res.json({
+                message: 'Get film favorite successfully',
+                data: rating
+            });
+        } catch (error) {
+            res.status(500).json({
+                message: 'Internal server error'
+            });
         }
     }
 }

@@ -26,13 +26,13 @@
                     </a>
                 </div>
 
-                <div class="pt-[85px] flex flex-col items-center gap-5 px-3">
+                <div class="pt-[65px] flex flex-col items-center gap-5 px-3">
                     <p class="text-sky-300 text-base font-semibold">
                         START SIGN UP
                     </p>
-                    <div class="font-bold text-white text-4xl lg:text-[45px] text-center capitalize leading-snug">
+                    <!-- <div class="font-bold text-white text-4xl lg:text-[45px] text-center capitalize leading-snug">
                         Order Movies
-                    </div>
+                    </div> -->
 
                     <!-- Form login -->
                     <section class="w-11/12 max-w-[460px]">
@@ -72,9 +72,9 @@
                                 <button type="submit" class="bg-indigo-600 rounded-full py-3 mt-4 text-center hover:bg-indigo-300">
                                     <span class="font-semibold text-white text-base">Register</span>
                                 </button>
-                                <a href="/" class="bg-indigo-600 rounded-full py-3 mt-4 text-center hover:bg-indigo-300">
+                                <router-link :to="{name: 'Login'}" class="bg-indigo-600 rounded-full py-3 mt-4 text-center hover:bg-indigo-300">
                                     <span class="font-semibold text-white text-base">Login</span>
-                                </a>
+                                </router-link>
                             </div>
                         </form>
                     </section>
@@ -92,6 +92,7 @@
 
 <script>
     import axios from "axios"
+    import { useToast } from "vue-toastification";
     export default {
         data() {
             return {
@@ -101,6 +102,14 @@
                 password: "",
                 confirmPassword: "",
             }
+        },
+        setup() {
+            const toast = useToast();
+            return { toast };
+        },
+        beforeCreate() {
+            if (this.$cookies.isKey("token"))
+                this.$router.go(-1);
         },
         methods: {
             async handlerRegister() {
@@ -113,10 +122,12 @@
                     confirmPassword: this.confirmPassword,
                 })
                     .then((response) => {
+                        this.toast.success(response.data.message)
                         // message = response.data.message
                         this.$router.push({ name: "Login" })
                     })
                     .catch((error) => {
+                        this.toast.error(error.response.data.message)
                         this.$router.push({ name: "Register" })
                     })
                 return message
