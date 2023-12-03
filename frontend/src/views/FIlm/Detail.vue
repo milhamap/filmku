@@ -237,7 +237,7 @@
                                                             <span class="sr-only">Close modal</span>
                                                         </button>
                                                         <div class="py-6 px-6 lg:px-8">
-                                                            <form @submit.prevent="">
+                                                            <form @submit.prevent="updateMovie">
                                                                 <!-- <span class="text-dark">{{movie.film.title}}</span> -->
                                                                 <div class="flex flex-col">
                                                                     <label class="text-dark" for="title">Title</label>
@@ -267,17 +267,16 @@
                                                                             <option v-for="genre in genres" :key="genre.id" v-bind:value="genre.id">{{genre.name}}</option>
                                                                         </select>
                                                                     </div>
-                                                                    <div class="flex flex-col col-6">
-                                                                        <label class="text-dark" for="room_id">Rooms</label>
-                                                                        <select v-model="rooms" id="room_id" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 font-bold text-center text-uppercase block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 mt-1">
-                                                                            <!-- <option selected>Rooms</option> -->
-                                                                            <option v-for="room in rooms" :key="room.id" v-bind:value="room.id">{{room.name}}</option>
+                                                                    <!-- <div class="flex flex-col col-6">
+                                                                        <label class="text-dark" for="room_name">Rooms</label>
+                                                                        <select v-model="room_name" id="room_name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 font-bold text-center text-uppercase block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 mt-1">
+                                                                            <option v-for="room in rooms" :key="room.id" v-bind:value="room.name">{{room.name}}</option>
                                                                         </select>
-                                                                    </div>
-                                                                    <div class="flex flex-col col-6">
+                                                                    </div> -->
+                                                                    <!-- <div class="flex flex-col col-6">
                                                                         <label class="text-dark" for="actors">Actors</label>
                                                                         <input type="text" id="actors" class="border border-gray-300 p-2 rounded-lg mt-1 focus:outline-none focus:border-indigo-500" v-model="actors">
-                                                                    </div>
+                                                                    </div> -->
                                                                     <div class="flex flex-col col-6">
                                                                         <label class="text-dark" for="release_date">Release Date</label>
                                                                         <input v-model="release_date" id="release_date" type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date">
@@ -347,8 +346,8 @@ import { useToast } from "vue-toastification"
                 forms: ref(null),
                 selected: ref(null),
                 favorites: ref([]),
-                rooms: ref([]),
-                rooms: '',
+                // rooms: ref([]),
+                // room_name: '',
                 genre_id: '',
                 showtimes: '',
                 duration: '',
@@ -403,18 +402,18 @@ import { useToast } from "vue-toastification"
             })
             // const datepicker = document.getElementById('datetime');
             // new DateRangePicker(datepicker)
-            axios.get('http://localhost:9000/rooms/', {
-                headers: {
-                    Authorization: `Bearer ${this.$cookies.get("token")}`
-                }
-            })
-            .then(res => {
-                this.rooms = res.data.data;
-                // console.log(res.data.data);
-            })
-            .catch(err => {
-                console.log(err);
-            })
+            // axios.get('http://localhost:9000/rooms/', {
+            //     headers: {
+            //         Authorization: `Bearer ${this.$cookies.get("token")}`
+            //     }
+            // })
+            // .then(res => {
+            //     this.rooms = res.data.data;
+            //     // console.log(res.data.data);
+            // })
+            // .catch(err => {
+            //     console.log(err);
+            // })
             const modal = document.querySelector(".modal");
 
             const showModal = document.querySelector(".show-modal")
@@ -548,16 +547,17 @@ import { useToast } from "vue-toastification"
             },
             async updateMovie () {
                 const toast = useToast()
+                // console.log(this.$route.params.id)
                 await axios.put('http://localhost:9000/films/' + this.$route.params.id, {
                     title: this.title,
                     description: this.description,
                     price: this.price,
                     duration: this.duration,
-                    actors: this.actors,
+                    // actors: this.actors,
                     genre_id: this.genre_id,
                     showtimes: this.showtimes,
                     expire_date: this.expire_date,
-                    rooms: this.rooms,
+                    // rooms: this.room_name,
                     release_date: this.release_date
                 }, {
                     headers: {

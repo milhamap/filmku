@@ -31,7 +31,7 @@ module.exports = {
             if (validate.length) return res.status(400).json(validate);
             const role = await Role.create({
                 name: name,
-                random: uuidv4()
+                random: uuidv4()            
             });
             res.json({
                 message: 'Role created',

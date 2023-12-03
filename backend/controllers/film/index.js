@@ -591,7 +591,7 @@ module.exports = {
     },
     updateFilm: async (req, res) => {
         const { random } = req.params;
-        const { title, price, description, duration, genre_id, showtimes, rooms, release_date, expire_date, actors } = req.body;
+        const { title, price, description, duration, genre_id, showtimes, release_date, expire_date } = req.body;
         // const schema = {
         //     title: 'string|empty:false',
         //     price: 'number|empty:false',
@@ -612,13 +612,13 @@ module.exports = {
         //         message: validate,
         //     });
         // }
-        const act = actors.split(',');
+        // const act = actors.split(', ');
+        // console.log(act);
         const durasi = duration + ' Minutes';
-        try {
+        // try {
             const films = await Film.findOne({
                 where: {
                     random,
-                    user_id: userId,
                 },
             });
             const film = await Film.update({
@@ -627,7 +627,6 @@ module.exports = {
                 description,
                 duration: durasi,
                 genre_id,
-                address,
                 release_date,
                 expire_date,
             }, {
@@ -635,69 +634,101 @@ module.exports = {
                     random: random,
                 },
             });
-            const room = await Room.findOne({
-                where: {
-                    film_id: films.id
-                }
-            });
-            act.forEach(async actor => {
-                await Actor.update({
-                    name: actor,
-                }, {
-                    where: {
-                        film_id: films.id
-                    }
-                });
-            });
+            // console.log(films);
+            // console.log(film);
+            // const default_room = await Default_Room.findAll({
+            //     where: {
+            //         film_id: films.id
+            //     }
+            // });
+            // const default_chair = await Default_Chair.findAll({
+            //     where: {
+            //         id: default_room.map(item => item.def_chair_id)
+            //     }
+            // });
+            // const room = await Room.findOne({
+            //     where: {
+            //         id: {
+            //             [Op.in]: default_chair.map(item => item.room_id)
+            //         }
+            //     }
+            // });
             await Showtime.update({
-                showtimes,
+                showtimes: showtimes,
             }, {
                 where: {
                     film_id: films.id
                 }
             });
-            if(room.name != rooms) {
-                await Room.create({
-                    name: rooms,
-                    film_id: films.id,
-                    random: uuidv4(),
-                });
-                const res_time = await Showtime.findAll({
-                    where: {
-                        film_id: film.id
-                    }
-                });
-                const results = await Room.findOne({
-                    where: {
-                        name: rooms
-                    }
-                });
-                let res_chair = await Default_Chair.findAll({
-                    where: {
-                        room_id: results.id
-                    }
-                });
-                for(let i = 0; i < res_chair.length; i++) {
-                    for(let j = 0; j < res_time.length; j++) {
-                        await Default_Room.create({
-                            film_id: film.id,
-                            // room_id: res.id,
-                            showtime_id: res_time[j].id,
-                            def_chair_id: res_chair[i].id,
-                            random: uuidv4()
-                        });
-                    }
-                }
-            }
+            // const actorfilm = await Actor.findAll({
+            //     where: {
+            //         film_id: films.id
+            //     }
+            // });
+            // console.log(actorfilm[0]);
+            // for(let i = 0; i < act.length; i++) {
+            //     // console.log(actorfilm[i].name);
+            //     const update = await Actor.update({
+            //         name: act[i]
+            //     }, {
+            //         where: {
+            //             id: actorfilm[i].id
+            //         }
+            //     });
+            //     // console.log(actorfilm[i].id);
+            //     // console.log(update);
+            // }
+            //     act.forEach(async actor => {
+            //     await Actor.update({
+            //         name: actor,
+            //     }, {
+            //         where: {
+            //             film_id: films.id
+            //         }
+            //     });
+            // });
+            // if(room.name != rooms) {
+            //     await Room.create({
+            //         name: rooms,
+            //         film_id: films.id,
+            //         random: uuidv4(),
+            //     });
+            //     const res_time = await Showtime.findAll({
+            //         where: {
+            //             film_id: film.id
+            //         }
+            //     });
+            //     const results = await Room.findOne({
+            //         where: {
+            //             name: rooms
+            //         }
+            //     });
+            //     let res_chair = await Default_Chair.findAll({
+            //         where: {
+            //             room_id: results.id
+            //         }
+            //     });
+            //     for(let i = 0; i < res_chair.length; i++) {
+            //         for(let j = 0; j < res_time.length; j++) {
+            //             await Default_Room.create({
+            //                 film_id: film.id,
+            //                 // room_id: res.id,
+            //                 showtime_id: res_time[j].id,
+            //                 def_chair_id: res_chair[i].id,
+            //                 random: uuidv4()
+            //             });
+            //         }
+            //     }
+            // }
             res.status(200).json({
                 status: 'success',
                 data: film
             });
-        } catch (error) {
-            res.status(500).json({
-                message: error.message,
-            });
-        }
+        // } catch (error) {
+        //     res.status(500).json({
+        //         message: error.message,
+        //     });
+        // }
     },
     deleteFilm: async (req, res) => {
         const { random } = req.params;
